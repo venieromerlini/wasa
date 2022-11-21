@@ -93,7 +93,8 @@ paths:
                     # change here if you decide to use an integer
                     # or any other type of identifier
                     type: string
-                    example: "abcdef012345"
+                    example: |-
+                      abcdef012345
   /home/{username}:
     parameters:
       - in: path
@@ -1114,7 +1115,8 @@ components:
         username:
           description: the username of the user, it is unique
           type: string
-          example: theUser
+          example: |-
+            theUser
           pattern: '^[a-zA-Z0-9_.-]*$'
       type: object
     Followee:
@@ -1124,7 +1126,8 @@ components:
         username:
           description: the username of the user, it is unique
           type: string
-          example: theFollowedUser
+          example: |-
+            theFollowedUser
           pattern: '^[a-zA-Z0-9_.-]*$'
       type: object
     Banned:
@@ -1134,7 +1137,8 @@ components:
         username:
           description: the username of the user, it is unique
           type: string
-          example: theBanneduser
+          example: |-
+            theBanneduser
           pattern: '^[a-zA-Z0-9_.-]*$'
       type: object
     Photo:
@@ -1335,7 +1339,6 @@ components:
             - 404
             - 405
             - 415
-            - 500
         message:
           type: string
           example: |-
