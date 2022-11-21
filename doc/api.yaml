@@ -40,9 +40,19 @@ info:
     email: merlini.1166162@studenti.uniroma1.it
 tags:
   - name: user
-    description: Everything about your Pets
+    description: Operations for the user
   - name: photo
-    description: Operations about user
+    description: Operations on the photos
+  - name: private
+    description: private Operations for the user (private area)
+  - name: follow
+    description: follow/unfollow operations
+  - name: ban
+    description: ban/unban operations
+  - name: comment
+    description: put or remove a comment
+  - name: like
+    description: like/unlike photo Opration
 
 paths:
   /session:
