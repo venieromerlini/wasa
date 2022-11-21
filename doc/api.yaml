@@ -124,7 +124,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiError'
-  /users/{username}:
+  /users/{username}/home:
     parameters:
       - in: path
         name: username
@@ -172,7 +172,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiError'
-  /users/{username}/profile:
+  /users/{username}:
     parameters:
       - in: path
         name: username
@@ -356,6 +356,89 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiError'
+  /photos/{photoId}:
+    parameters:
+      - in: query
+        name: username
+        description: the username of the user
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: photoId
+        description: the photo id
+        required: true
+        schema:
+          type: string
+      - in: header
+        description: session identifier
+        name: X-user-session-identifier
+        schema:
+          type: string
+    get:
+      tags:
+        - photo
+      summary: find photo
+      description: |-
+        Retrieve a particular photo of a user (if exist both the user and the photo).
+        The requestor may not have the grant to invoke this api.
+        Only json media type is supported.
+      operationId: findUserPhoto
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Photo'
+        '401':
+          description: Not Authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: Not found
+          # this error could happen if either the user or the photo have been canceled before invoking this api
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '415':
+          description: Unsupported Media Type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+    delete:
+      tags:
+        - photo
+      summary: remove a photo of a user
+      description: |-
+        Remove a user photo. 
+        This api is idempotent.
+        The requestor may not have the grant to invoke this api.
+        Only json media type is supported.
+      operationId: deletePhoto
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmptyReponse'
+        '401':
+          description: Not Authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '415':
+          description: Unsupported Media Type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
   /follows:
     parameters:
       - in: query
@@ -412,6 +495,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiError'
+
+  /follows/{followId}:
+    parameters:
+      - in: path
+        name: followId
+        description: the follow id to be deleted
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: username
+        description: the username
+        required: true
+        schema:
+          type: string
+      - in: header
+        description: session identifier
+        name: X-user-session-identifier
+        schema:
+          type: string
     delete:
       tags:
         - follow
@@ -505,6 +608,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiError'
+  /bans/{banId}:
+    parameters:
+      - in: path
+        name: banId
+        description: the ban id to be deleted
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: username
+        description: the username of the user to retrieve
+        required: true
+        schema:
+          type: string
+      - in: header
+        description: session identifier
+        name: X-user-session-identifier
+        schema:
+          type: string
     delete:
       tags:
         - ban
@@ -534,60 +656,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiError'
-  /photos/{photoId}:
-    parameters:
-      - in: query
-        name: username
-        description: the username of the user
-        required: true
-        schema:
-          type: string
-      - in: path
-        name: photoId
-        description: the photo id
-        required: true
-        schema:
-          type: string
-      - in: header
-        description: session identifier
-        name: X-user-session-identifier
-        schema:
-          type: string
-    get:
-      tags:
-        - photo
-      summary: find photo
-      description: |-
-        Retrieve a particular photo of a user (if exist both the user and the photo).
-        The requestor may not have the grant to invoke this api.
-        Only json media type is supported.
-      operationId: findUserPhoto
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Photo'
-        '401':
-          description: Not Authorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '404':
-          description: Not found
-          # this error could happen if either the user or the photo have been canceled before invoking this api
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '415':
-          description: Unsupported Media Type
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
+
   /likes:
     parameters:
       - in: query
@@ -641,35 +710,6 @@ paths:
         '404':
           description: Not found
           # this error could happen if either the user or the photo have been canceled before invoking this api
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '415':
-          description: Unsupported Media Type
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-    delete:
-      tags:
-        - photo
-      summary: remove a photo of a user
-      description: |-
-        Remove a user photo. 
-        This api is idempotent.
-        The requestor may not have the grant to invoke this api.
-        Only json media type is supported.
-      operationId: deletePhoto
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EmptyReponse'
-        '401':
-          description: Not Authorized
           content:
             application/json:
               schema:
