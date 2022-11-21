@@ -43,8 +43,6 @@ tags:
     description: Operations for the user
   - name: photo
     description: Operations on the photos
-  - name: private
-    description: private Operations for the user (private area)
   - name: follow
     description: follow/unfollow operations
   - name: ban
@@ -93,48 +91,7 @@ paths:
                     # or any other type of identifier
                     type: string
                     example: "abcdef012345"
-  /users:
-    parameters:
-      - in: header
-        name: X-user-session-identifier
-        description: session identifier
-        schema:
-          type: string
-    get:
-      tags:
-        - user
-      summary: find all users
-      description: |-
-        find all user in the database, including the requestor user. 
-        The requestor may not have the grant to invoke this api.
-        Only json media type is supported.
-      operationId: findAllUser
-      responses:
-        '200':
-          description: ok
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Users'
-        '401':
-          description: Not Authorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '405':
-          description: Method Not Allowed
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '415':
-          description: Unsupported Media Type
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-  /users/{username}/home:
+  /home/{username}:
     parameters:
       - in: path
         name: username
@@ -142,11 +99,15 @@ paths:
         required: true
         schema:
           type: string
+          pattern:  'ˆ.*?$'
+          example: theUserName
       - in: header
         name: X-user-session-identifier
         description: session identifier
         schema:
           type: string
+          pattern:  'ˆ.*?$'
+          example: theUserName
     get:
       tags:
         - user
@@ -182,6 +143,49 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiError'
+  /users:
+    parameters:
+      - in: header
+        name: X-user-session-identifier
+        description: session identifier
+        schema:
+          type: string
+          pattern:  'ˆ.*?$'
+          example: theUserInSession
+    get:
+      tags:
+        - user
+      summary: find all users
+      description: |-
+        find all user in the database, including the requestor user. 
+        The requestor may not have the grant to invoke this api.
+        Only json media type is supported.
+      operationId: findAllUser
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Users'
+        '401':
+          description: Not Authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '405':
+          description: Method Not Allowed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '415':
+          description: Unsupported Media Type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
   /users/{username}:
     parameters:
       - in: path
@@ -190,14 +194,17 @@ paths:
         required: true
         schema:
           type: string
+          pattern:  'ˆ.*?$'
+          example: theUserName
       - in: header
         name: X-user-session-identifier
         description: session identifier
         schema:
           type: string
+          pattern:  'ˆ.*?$'
+          example: theUserInSession
     get:
       tags:
-        - private
         - user
       summary: find a user profile
       description: |-
@@ -233,7 +240,6 @@ paths:
                 $ref: '#/components/schemas/ApiError'
     patch:
       tags:
-        - private
         - user
       summary: update username
       description: |-
@@ -282,11 +288,15 @@ paths:
         required: true
         schema:
           type: string
+          pattern:  'ˆ.*?$'
+          example: theUser
       - in: header
         name: X-user-session-identifier
         description: session identifier
         schema:
           type: string
+          pattern:  'ˆ.*?$'
+          example: theUserInSession
     get:
       tags:
         - photo
@@ -374,17 +384,23 @@ paths:
         required: true
         schema:
           type: string
+          pattern:  'ˆ.*?$'
+          example: theUser
       - in: path
         name: photoId
         description: the photo id
         required: true
         schema:
           type: string
+          pattern:  'ˆ.*?$'
+          example: 10
       - in: header
         description: session identifier
         name: X-user-session-identifier
         schema:
           type: string
+          pattern:  'ˆ.*?$'
+          example: theUserInSession
     get:
       tags:
         - photo
@@ -457,11 +473,15 @@ paths:
         required: true
         schema:
           type: string
+          pattern:  'ˆ.*?$'
+          example: theUser
       - in: header
         description: session identifier
         name: X-user-session-identifier
         schema:
           type: string
+          pattern:  'ˆ.*?$'
+          example: theUserInSession
     post:
       tags:
         - follow
@@ -514,17 +534,23 @@ paths:
         required: true
         schema:
           type: string
+          pattern:  'ˆ.*?$'
+          example: 10
       - in: query
         name: username
         description: the username
         required: true
         schema:
           type: string
+          pattern:  'ˆ.*?$'
+          example: theUser
       - in: header
         description: session identifier
         name: X-user-session-identifier
         schema:
           type: string
+          pattern:  'ˆ.*?$'
+          example: theUserInSession
     delete:
       tags:
         - follow
@@ -569,11 +595,15 @@ paths:
         required: true
         schema:
           type: string
+          pattern:  'ˆ.*?$'
+          example: theUser
       - in: header
         description: session identifier
         name: X-user-session-identifier
         schema:
           type: string
+          pattern:  'ˆ.*?$'
+          example: theUserInSession
     post:
       tags:
         - ban
@@ -626,17 +656,23 @@ paths:
         required: true
         schema:
           type: string
+          pattern:  'ˆ.*?$'
+          example: 10
       - in: query
         name: username
         description: the username of the user to retrieve
         required: true
         schema:
           type: string
+          pattern:  'ˆ.*?$'
+          example: theUser
       - in: header
         description: session identifier
         name: X-user-session-identifier
         schema:
           type: string
+          pattern:  'ˆ.*?$'
+          example: theUserInSession
     delete:
       tags:
         - ban
@@ -666,7 +702,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiError'
-
   /likes:
     parameters:
       - in: query
@@ -675,17 +710,23 @@ paths:
         required: true
         schema:
           type: string
+          pattern:  'ˆ.*?$'
+          example: theUser
       - in: query
         name: photoId
         description: the photo id
         required: true
         schema:
           type: string
+          pattern:  'ˆ.*?$'
+          example: 10
       - in: header
         description: session identifier
         name: X-user-session-identifier
         schema:
           type: string
+          pattern:  'ˆ.*?$'
+          example: theUserInSession
     post:
       tags:
         - like
@@ -738,23 +779,31 @@ paths:
         required: true
         schema:
           type: string
+          pattern:  'ˆ.*?$'
+          example: theUser
       - in: query
         name: photoId
         description: the photo id
         required: true
         schema:
           type: string
+          pattern:  'ˆ.*?$'
+          example: 11
       - in: path
         name: likeId
         description: the like id
         required: true
         schema:
           type: string
+          pattern:  'ˆ.*?$'
+          example: 10
       - in: header
         description: session identifier
         name: X-user-session-identifier
         schema:
           type: string
+          pattern:  'ˆ.*?$'
+          example: theUserInSession
     delete:
       tags:
         - like
@@ -792,17 +841,23 @@ paths:
         required: true
         schema:
           type: string
+          pattern:  'ˆ.*?$'
+          example: theUser
       - in: query
         name: photoId
         description: the photo id
         required: true
         schema:
           type: string
+          pattern:  'ˆ.*?$'
+          example: 10
       - in: header
         description: session identifier
         name: X-user-session-identifier
         schema:
           type: string
+          pattern:  'ˆ.*?$'
+          example: theUserInSession
     post:
       tags:
         - comment
@@ -854,24 +909,31 @@ paths:
         required: true
         schema:
           type: string
+          pattern:  'ˆ.*?$'
+          example: theUser
       - in: query
         name: photoId
         description: the photo id
         required: true
         schema:
           type: string
+          pattern:  'ˆ.*?$'
+          example: 11
       - in: path
         name: commentId
         description: the comment id
         required: true
         schema:
           type: string
+          pattern:  'ˆ.*?$'
+          example: 10
       - in: header
         name: X-user-session-identifier
         schema:
           description: session identifier
           type: string
           pattern:  'ˆ.*?$'
+          example: theUserInSession
     delete:
       tags:
         - comment
@@ -974,6 +1036,7 @@ components:
         uploadDate:
           description: the upload date for this photo
           pattern:  'ˆ.*?$'
+          example: 01-01-2022
           type: string
           format: date-time
       type: object
@@ -1068,6 +1131,7 @@ components:
           minimum: 1
         text:
           type: string
+          pattern:  'ˆ.*?$'
           example: U R GORGEOUS!
         user:
           $ref: '#/components/schemas/User'
