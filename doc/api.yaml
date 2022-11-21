@@ -313,7 +313,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiError'
-    put:
+    post:
       tags:
         - photo
       summary: upload new photo
@@ -369,7 +369,7 @@ paths:
         name: X-user-session-identifier
         schema:
           type: string
-    put:
+    post:
       tags:
         - follow
       summary: follow another user
@@ -461,7 +461,7 @@ paths:
         name: X-user-session-identifier
         schema:
           type: string
-    put:
+    post:
       tags:
         - ban
       summary: ban another user
@@ -607,7 +607,7 @@ paths:
         name: X-user-session-identifier
         schema:
           type: string
-    put:
+    post:
       tags:
         - like
       summary: like a user photo
@@ -753,7 +753,7 @@ paths:
         name: X-user-session-identifier
         schema:
           type: string
-    put:
+    post:
       tags:
         - comment
       summary: add a comment to a photo of a user
@@ -850,9 +850,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiError'
-externalDocs:
-  description: Find out more about Swagger
-  url: 'http://swagger.io'
 components:
   schemas:
     User:
