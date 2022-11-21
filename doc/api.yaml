@@ -103,7 +103,7 @@ paths:
         required: true
         schema:
           type: string
-          pattern:  'ˆ.*?$'
+          pattern:  '^[a-zA-Z0-9_.-]*$'
           example:  |-
             theUserName
           minLength: 3
@@ -114,7 +114,7 @@ paths:
           session identifier
         schema:
           type: string
-          pattern:  'ˆ.*?$'
+          pattern:  '^[a-zA-Z0-9_.-]*$'
           minLength: 3
           maxLength: 180
           example:  |-
@@ -162,7 +162,7 @@ paths:
           session identifier
         schema:
           type: string
-          pattern:  'ˆ.*?$'
+          pattern:  '^[a-zA-Z0-9_.-]*$'
           example:  |-
             theUserInSession
     get:
@@ -211,7 +211,7 @@ paths:
         required: true
         schema:
           type: string
-          pattern:  'ˆ.*?$'
+          pattern:  '^[a-zA-Z0-9_.-]*$'
           minLength: 3
           maxLength: 16
           example:  |-
@@ -222,7 +222,7 @@ paths:
           session identifier
         schema:
           type: string
-          pattern:  'ˆ.*?$'
+          pattern:  '^[a-zA-Z0-9_.-]*$'
           minLength: 3
           maxLength: 180
           example:  |-
@@ -312,7 +312,7 @@ paths:
         required: true
         schema:
           type: string
-          pattern:  'ˆ.*?$'
+          pattern:  '^[a-zA-Z0-9_.-]*$'
           example:  |-
             theUser
           minLength: 3
@@ -323,7 +323,7 @@ paths:
           session identifier
         schema:
           type: string
-          pattern:  'ˆ.*?$'
+          pattern:  '^[a-zA-Z0-9_.-]*$'
           minLength: 3
           maxLength: 180
           example: |-
@@ -425,7 +425,7 @@ paths:
         required: true
         schema:
           type: string
-          pattern:  'ˆ.*?$'
+          pattern:  '^[a-zA-Z0-9_.-]*$'
           minLength: 3
           maxLength: 16
           example: |-
@@ -437,7 +437,7 @@ paths:
         required: true
         schema:
           type: string
-          pattern:  'ˆ.*?$'
+          pattern:  '^[a-zA-Z0-9_.-]*$'
           minLength: 1
           maxLength: 32
           example: |-
@@ -448,7 +448,7 @@ paths:
           session identifier
         schema:
           type: string
-          pattern:  'ˆ.*?$'
+          pattern:  '^[a-zA-Z0-9_.-]*$'
           minLength: 3
           maxLength: 180
           example: |-
@@ -526,7 +526,7 @@ paths:
         required: true
         schema:
           type: string
-          pattern:  'ˆ.*?$'
+          pattern:  '^[a-zA-Z0-9_.-]*$'
           minLength: 3
           maxLength: 16
           example: |-
@@ -537,7 +537,7 @@ paths:
         name: X-user-session-identifier
         schema:
           type: string
-          pattern:  'ˆ.*?$'
+          pattern:  '^[a-zA-Z0-9_.-]*$'
           minLength: 3
           maxLength: 180
           example: |-
@@ -595,7 +595,7 @@ paths:
         required: true
         schema:
           type: string
-          pattern:  'ˆ.*?$'
+          pattern:  '^[a-zA-Z0-9_.-]*$'
           example: |-
             10
           minLength: 1
@@ -607,7 +607,7 @@ paths:
         required: true
         schema:
           type: string
-          pattern:  'ˆ.*?$'
+          pattern:  '^[a-zA-Z0-9_.-]*$'
           minLength: 3
           maxLength: 16
           example: |-
@@ -618,7 +618,7 @@ paths:
         name: X-user-session-identifier
         schema:
           type: string
-          pattern:  'ˆ.*?$'
+          pattern:  '^[a-zA-Z0-9_.-]*$'
           minLength: 3
           maxLength: 180
           example: |-
@@ -668,7 +668,7 @@ paths:
         required: true
         schema:
           type: string
-          pattern:  'ˆ.*?$'
+          pattern:  '^[a-zA-Z0-9_.-]*$'
           minLength: 3
           maxLength: 16
           example: |-
@@ -679,7 +679,7 @@ paths:
         name: X-user-session-identifier
         schema:
           type: string
-          pattern:  'ˆ.*?$'
+          pattern:  '^[a-zA-Z0-9_.-]*$'
           minLength: 3
           maxLength: 180
           example: |-
@@ -737,7 +737,7 @@ paths:
         required: true
         schema:
           type: string
-          pattern:  'ˆ.*?$'
+          pattern:  '^[a-zA-Z0-9_.-]*$'
           minLength: 1
           maxLength: 32
           example: |-
@@ -749,7 +749,7 @@ paths:
         required: true
         schema:
           type: string
-          pattern:  'ˆ.*?$'
+          pattern:  '^[a-zA-Z0-9_.-]*$'
           minLength: 3
           maxLength: 16
           example: |-
@@ -762,7 +762,7 @@ paths:
           type: string
           minLength: 3
           maxLength: 180
-          pattern:  'ˆ.*?$'
+          pattern:  '^[a-zA-Z0-9_.-]*$'
           example: |-
             theUserInSession
     delete:
@@ -802,7 +802,7 @@ paths:
         required: true
         schema:
           type: string
-          pattern:  'ˆ.*?$'
+          pattern:  '^[a-zA-Z0-9_.-]*$'
           minLength: 3
           maxLength: 16
           example: |-
@@ -813,7 +813,7 @@ paths:
         required: true
         schema:
           type: string
-          pattern:  'ˆ.*?$'
+          pattern:  '^[a-zA-Z0-9_.-]*$'
           minLength: 1
           maxLength: 32
           example: |-
@@ -824,7 +824,7 @@ paths:
         name: X-user-session-identifier
         schema:
           type: string
-          pattern:  'ˆ.*?$'
+          pattern:  '^[a-zA-Z0-9_.-]*$'
           minLength: 3
           maxLength: 180
           example: |-
@@ -882,7 +882,7 @@ paths:
         required: true
         schema:
           type: string
-          pattern:  'ˆ.*?$'
+          pattern:  '^[a-zA-Z0-9_.-]*$'
           minLength: 3
           maxLength: 16
           example: |-
@@ -894,7 +894,7 @@ paths:
         required: true
         schema:
           type: string
-          pattern:  'ˆ.*?$'
+          pattern:  '^[a-zA-Z0-9_.-]*$'
           minLength: 1
           maxLength: 32
           example: |-
@@ -905,7 +905,7 @@ paths:
         required: true
         schema:
           type: string
-          pattern:  'ˆ.*?$'
+          pattern:  '^[a-zA-Z0-9_.-]*$'
           minLength: 1
           maxLength: 32
           example: |-
@@ -916,7 +916,7 @@ paths:
         name: X-user-session-identifier
         schema:
           type: string
-          pattern:  'ˆ.*?$'
+          pattern:  '^[a-zA-Z0-9_.-]*$'
           minLength: 3
           maxLength: 180
           example: |-
@@ -958,7 +958,7 @@ paths:
         required: true
         schema:
           type: string
-          pattern:  'ˆ.*?$'
+          pattern: '^[a-zA-Z0-9_.-]*$'
           minLength: 3
           maxLength: 16
           example: |-
@@ -970,7 +970,7 @@ paths:
         required: true
         schema:
           type: string
-          pattern:  'ˆ.*?$'
+          pattern: '^[a-zA-Z0-9_.-]*$'
           minLength: 1
           maxLength: 32
           example: |-
@@ -981,7 +981,7 @@ paths:
         name: X-user-session-identifier
         schema:
           type: string
-          pattern:  'ˆ.*?$'
+          pattern:  '^[a-zA-Z0-9_.-]*$'
           minLength: 3
           maxLength: 180
           example: |-
@@ -1038,7 +1038,7 @@ paths:
         required: true
         schema:
           type: string
-          pattern:  'ˆ.*?$'
+          pattern:  '^[a-zA-Z0-9_.-]*$'
           minLength: 3
           maxLength: 16
           example: |-
@@ -1050,7 +1050,7 @@ paths:
         required: true
         schema:
           type: string
-          pattern:  'ˆ.*?$'
+          pattern:  '^[a-zA-Z0-9_.-]*$'
           minLength: 1
           maxLength: 32
           example: |-
@@ -1061,7 +1061,7 @@ paths:
         required: true
         schema:
           type: string
-          pattern:  'ˆ.*?$'
+          pattern:  '^[a-zA-Z0-9_.-]*$'
           minLength: 1
           maxLength: 32
           example: |-
@@ -1072,7 +1072,7 @@ paths:
           description: |-
             session identifier
           type: string
-          pattern:  'ˆ.*?$'
+          pattern:  '^[a-zA-Z0-9_.-]*$'
           minLength: 3
           maxLength: 180
           example:  |-
@@ -1167,14 +1167,14 @@ components:
             $ref: '#/components/schemas/Comment'
         data:
           description: base64 data photo
-          pattern:  'ˆ.*?$'
+          pattern:  '^[a-zA-Z0-9_.-]*$'
           example: |-
             iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAB
           type: string
           format: byte
         uploadDate:
           description: the upload date for this photo
-          pattern:  'ˆ.*?$'
+          pattern: '^[a-zA-Z0-9_.-]*$'
           example: |-
             01-01-2022
           type: string
@@ -1274,7 +1274,7 @@ components:
           maximum: 999999
         text:
           type: string
-          pattern:  'ˆ.*?$'
+          pattern: '^[a-zA-Z0-9_.-]*$'
           minLength: 1
           maxLength: 999
           example: |-
