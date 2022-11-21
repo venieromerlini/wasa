@@ -71,9 +71,11 @@ paths:
               type: object
               properties:
                 name:
-                  description: username description
+                  description:  |-
+                    username description
                   type: string
-                  example: Veniero
+                  example: |-
+                    Veniero
                   pattern: 'ˆ.*?$'
                   minLength: 3
                   maxLength: 16
@@ -84,6 +86,7 @@ paths:
           content:
             application/json:
               schema:
+                description: the success log response
                 type: object
                 properties:
                   identifier:
@@ -95,19 +98,27 @@ paths:
     parameters:
       - in: path
         name: username
-        description: the username of the user to retrieve
+        description: |-
+          the username of the user to retrieve
         required: true
         schema:
           type: string
           pattern:  'ˆ.*?$'
-          example: theUserName
+          example:  |-
+            theUserName
+          minLength: 3
+          maxLength: 16
       - in: header
         name: X-user-session-identifier
-        description: session identifier
+        description: |-
+          session identifier
         schema:
           type: string
           pattern:  'ˆ.*?$'
-          example: theUserName
+          minLength: 3
+          maxLength: 180
+          example:  |-
+            theUserName
     get:
       tags:
         - user
@@ -147,11 +158,13 @@ paths:
     parameters:
       - in: header
         name: X-user-session-identifier
-        description: session identifier
+        description:  |-
+          session identifier
         schema:
           type: string
           pattern:  'ˆ.*?$'
-          example: theUserInSession
+          example:  |-
+            theUserInSession
     get:
       tags:
         - user
@@ -167,7 +180,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Users'
+                type: array
+                minItems: 0
+                maxItems: 999999
+                items:
+                  $ref: '#/components/schemas/User'
         '401':
           description: Not Authorized
           content:
@@ -195,14 +212,21 @@ paths:
         schema:
           type: string
           pattern:  'ˆ.*?$'
-          example: theUserName
+          minLength: 3
+          maxLength: 16
+          example:  |-
+            theUserName
       - in: header
         name: X-user-session-identifier
-        description: session identifier
+        description:  |-
+          session identifier
         schema:
           type: string
           pattern:  'ˆ.*?$'
-          example: theUserInSession
+          minLength: 3
+          maxLength: 180
+          example:  |-
+            theUserInSession
     get:
       tags:
         - user
@@ -289,14 +313,21 @@ paths:
         schema:
           type: string
           pattern:  'ˆ.*?$'
-          example: theUser
+          example:  |-
+            theUser
+          minLength: 3
+          maxLength: 16
       - in: header
         name: X-user-session-identifier
-        description: session identifier
+        description: |-
+          session identifier
         schema:
           type: string
           pattern:  'ˆ.*?$'
-          example: theUserInSession
+          minLength: 3
+          maxLength: 180
+          example: |-
+            theUserInSession
     get:
       tags:
         - photo
@@ -313,7 +344,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Photos'
+                type: array
+                minItems: 0
+                maxItems: 999999
+                items:
+                  $ref: '#/components/schemas/Photo'
         '401':
           description: Not Authorized
           content:
@@ -346,10 +381,15 @@ paths:
         description: Uploaded photo
         required: true
         content:
-          image/png:
+          multipart/form-data:
             schema:
-              type: string
-              format: binary
+              type: object
+              properties:
+                file:
+                  description: |-
+                    file to upload
+                  type: string
+                  format: binary
       responses:
         '201':
           description: Created
@@ -380,27 +420,39 @@ paths:
     parameters:
       - in: query
         name: username
-        description: the username of the user
+        description: |-
+          the username of the user
         required: true
         schema:
           type: string
           pattern:  'ˆ.*?$'
-          example: theUser
+          minLength: 3
+          maxLength: 16
+          example: |-
+            theUser
       - in: path
         name: photoId
-        description: the photo id
+        description: |-
+          the photo id
         required: true
         schema:
           type: string
           pattern:  'ˆ.*?$'
-          example: 10
+          minLength: 1
+          maxLength: 32
+          example: |-
+            10
       - in: header
-        description: session identifier
         name: X-user-session-identifier
+        description: |-
+          session identifier
         schema:
           type: string
           pattern:  'ˆ.*?$'
-          example: theUserInSession
+          minLength: 3
+          maxLength: 180
+          example: |-
+            theUserInSession
     get:
       tags:
         - photo
@@ -469,19 +521,27 @@ paths:
     parameters:
       - in: query
         name: username
-        description: the username
+        description: |-
+          the username
         required: true
         schema:
           type: string
           pattern:  'ˆ.*?$'
-          example: theUser
+          minLength: 3
+          maxLength: 16
+          example: |-
+            theUser
       - in: header
-        description: session identifier
+        description: |-
+          session identifier
         name: X-user-session-identifier
         schema:
           type: string
           pattern:  'ˆ.*?$'
-          example: theUserInSession
+          minLength: 3
+          maxLength: 180
+          example: |-
+            theUserInSession
     post:
       tags:
         - follow
@@ -530,27 +590,39 @@ paths:
     parameters:
       - in: path
         name: followId
-        description: the follow id to be deleted
+        description: |-
+          the follow id to be deleted
         required: true
         schema:
           type: string
           pattern:  'ˆ.*?$'
-          example: 10
+          example: |-
+            10
+          minLength: 1
+          maxLength: 32
       - in: query
         name: username
-        description: the username
+        description: |-
+          the username
         required: true
         schema:
           type: string
           pattern:  'ˆ.*?$'
-          example: theUser
+          minLength: 3
+          maxLength: 16
+          example: |-
+            theUser
       - in: header
-        description: session identifier
+        description: |-
+          session identifier
         name: X-user-session-identifier
         schema:
           type: string
           pattern:  'ˆ.*?$'
-          example: theUserInSession
+          minLength: 3
+          maxLength: 180
+          example: |-
+            theUserInSession
     delete:
       tags:
         - follow
@@ -591,19 +663,27 @@ paths:
     parameters:
       - in: query
         name: username
-        description: the username of the user to retrieve
+        description: |-
+          the username of the user to retrieve
         required: true
         schema:
           type: string
           pattern:  'ˆ.*?$'
-          example: theUser
+          minLength: 3
+          maxLength: 16
+          example: |-
+            theUser
       - in: header
-        description: session identifier
+        description: |-
+          session identifier
         name: X-user-session-identifier
         schema:
           type: string
           pattern:  'ˆ.*?$'
-          example: theUserInSession
+          minLength: 3
+          maxLength: 180
+          example: |-
+            theUserInSession
     post:
       tags:
         - ban
@@ -652,27 +732,39 @@ paths:
     parameters:
       - in: path
         name: banId
-        description: the ban id to be deleted
+        description: |-
+          the ban id to be deleted
         required: true
         schema:
           type: string
           pattern:  'ˆ.*?$'
-          example: 10
+          minLength: 1
+          maxLength: 32
+          example: |-
+            10
       - in: query
         name: username
-        description: the username of the user to retrieve
+        description: |-
+          the username of the user to retrieve
         required: true
         schema:
           type: string
           pattern:  'ˆ.*?$'
-          example: theUser
+          minLength: 3
+          maxLength: 16
+          example: |-
+            theUser
       - in: header
-        description: session identifier
+        description: |-
+          session identifier
         name: X-user-session-identifier
         schema:
           type: string
+          minLength: 3
+          maxLength: 180
           pattern:  'ˆ.*?$'
-          example: theUserInSession
+          example: |-
+            theUserInSession
     delete:
       tags:
         - ban
@@ -711,7 +803,10 @@ paths:
         schema:
           type: string
           pattern:  'ˆ.*?$'
-          example: theUser
+          minLength: 3
+          maxLength: 16
+          example: |-
+            theUser
       - in: query
         name: photoId
         description: the photo id
@@ -719,14 +814,21 @@ paths:
         schema:
           type: string
           pattern:  'ˆ.*?$'
-          example: 10
+          minLength: 1
+          maxLength: 32
+          example: |-
+            10
       - in: header
-        description: session identifier
+        description: |-
+          session identifier
         name: X-user-session-identifier
         schema:
           type: string
           pattern:  'ˆ.*?$'
-          example: theUserInSession
+          minLength: 3
+          maxLength: 180
+          example: |-
+            theUserInSession
     post:
       tags:
         - like
@@ -775,20 +877,28 @@ paths:
     parameters:
       - in: query
         name: username
-        description: the username of the user
+        description: |-
+          the username of the user
         required: true
         schema:
           type: string
           pattern:  'ˆ.*?$'
-          example: theUser
+          minLength: 3
+          maxLength: 16
+          example: |-
+            theUser
       - in: query
         name: photoId
-        description: the photo id
+        description: |-
+          the photo id
         required: true
         schema:
           type: string
           pattern:  'ˆ.*?$'
-          example: 11
+          minLength: 1
+          maxLength: 32
+          example: |-
+            11
       - in: path
         name: likeId
         description: the like id
@@ -796,14 +906,21 @@ paths:
         schema:
           type: string
           pattern:  'ˆ.*?$'
-          example: 10
+          minLength: 1
+          maxLength: 32
+          example: |-
+            10
       - in: header
-        description: session identifier
+        description: |-
+          session identifier
         name: X-user-session-identifier
         schema:
           type: string
           pattern:  'ˆ.*?$'
-          example: theUserInSession
+          minLength: 3
+          maxLength: 180
+          example: |-
+            theUserInSession
     delete:
       tags:
         - like
@@ -842,22 +959,33 @@ paths:
         schema:
           type: string
           pattern:  'ˆ.*?$'
-          example: theUser
+          minLength: 3
+          maxLength: 16
+          example: |-
+            theUser
       - in: query
         name: photoId
-        description: the photo id
+        description: |-
+          the photo id
         required: true
         schema:
           type: string
           pattern:  'ˆ.*?$'
-          example: 10
+          minLength: 1
+          maxLength: 32
+          example: |-
+            10
       - in: header
-        description: session identifier
+        description: |-
+          session identifier
         name: X-user-session-identifier
         schema:
           type: string
           pattern:  'ˆ.*?$'
-          example: theUserInSession
+          minLength: 3
+          maxLength: 180
+          example: |-
+            theUserInSession
     post:
       tags:
         - comment
@@ -905,20 +1033,28 @@ paths:
     parameters:
       - in: query
         name: username
-        description: the username of the user
+        description: |-
+          the username of the user
         required: true
         schema:
           type: string
           pattern:  'ˆ.*?$'
-          example: theUser
+          minLength: 3
+          maxLength: 16
+          example: |-
+            theUser
       - in: query
         name: photoId
-        description: the photo id
+        description: |-
+          the photo id
         required: true
         schema:
           type: string
           pattern:  'ˆ.*?$'
-          example: 11
+          minLength: 1
+          maxLength: 32
+          example: |-
+            11
       - in: path
         name: commentId
         description: the comment id
@@ -926,14 +1062,21 @@ paths:
         schema:
           type: string
           pattern:  'ˆ.*?$'
-          example: 10
+          minLength: 1
+          maxLength: 32
+          example: |-
+            10
       - in: header
         name: X-user-session-identifier
         schema:
-          description: session identifier
+          description: |-
+            session identifier
           type: string
           pattern:  'ˆ.*?$'
-          example: theUserInSession
+          minLength: 3
+          maxLength: 180
+          example:  |-
+            theUserInSession
     delete:
       tags:
         - comment
@@ -994,13 +1137,6 @@ components:
           example: theBanneduser
           pattern: '^[a-zA-Z0-9_.-]*$'
       type: object
-    Users:
-      description: it represents a list of users
-      type: array
-      minItems: 0
-      maxItems: 1_000_000_000
-      items:
-        $ref: '#/components/schemas/User'
     Photo:
       description: it represents a photo uploaded by a user
       x-swagger-router-model: it.uniroma1.wasa.venieromerlini.model.Photo
@@ -1009,44 +1145,41 @@ components:
           description: the photo id
           type: integer
           format: int64
-          example: 1234
+          example: |-
+            1234
           minimum: 1
+          maximum: 999999
         user:
           $ref: '#/components/schemas/User'
         likes:
           description: the likes received for this photo
           type: array
           minItems: 0
-          maxItems: 1_000_000_000
+          maxItems: 999999
           items:
             $ref: '#/components/schemas/Like'
         comments:
           description: the comments received for this photo
-          minItems: 0
-          maxItems: 1_000_000_000
           type: array
+          minItems: 0
+          maxItems: 999999
           items:
             $ref: '#/components/schemas/Comment'
         data:
           description: base64 data photo
           pattern:  'ˆ.*?$'
-          example: iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAB
+          example: |-
+            iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAB
           type: string
           format: byte
         uploadDate:
           description: the upload date for this photo
           pattern:  'ˆ.*?$'
-          example: 01-01-2022
+          example: |-
+            01-01-2022
           type: string
           format: date-time
       type: object
-    Photos:
-      description: it represents a list of photos.
-      type: array
-      minItems: 0
-      maxItems: 1_000_000_000
-      items:
-        $ref: '#/components/schemas/Photo'
     Profile:
       description: it represents the profile data of user. It contains not public informations
       x-swagger-router-model: it.uniroma1.wasa.venieromerlini.model.Profile
@@ -1055,27 +1188,31 @@ components:
           description: the profile id
           type: integer
           format: int64
-          example: 1234
+          example: |-
+            1234
           minimum: 1
+          maximum: 999999
         user:
           $ref: '#/components/schemas/User'
         photos:
           description: the photos of the user
           type: array
+          minItems: 0
+          maxItems: 999999
           items:
             $ref: '#/components/schemas/Photo'
         followees:
           description: the users that follows the user
           type: array
           minItems: 0
-          maxItems: 1_000_000_000
+          maxItems: 999999
           items:
             $ref: '#/components/schemas/Follow'
         followers:
           description: the user's followers
           type: array
           minItems: 0
-          maxItems: 1_000_000_000
+          maxItems: 999999
           items:
             $ref: '#/components/schemas/Follow'
       type: object
@@ -1087,22 +1224,24 @@ components:
           description: the homepage id
           type: integer
           format: int64
-          example: 1234
+          example: |-
+            1234
           minimum: 1
+          maximum: 999999
         user:
           $ref: '#/components/schemas/User'
         photos:
           description: the photos beloning to the user's followees
           type: array
           minItems: 0
-          maxItems: 1_000_000_000
+          maxItems: 999999
           items:
             $ref: '#/components/schemas/Photo'
         followees:
           description: the user followees
           type: array
           minItems: 0
-          maxItems: 1_000_000_000
+          maxItems: 999999
           items:
             $ref: '#/components/schemas/Follow'
       type: object
@@ -1113,8 +1252,10 @@ components:
           description: the like id
           type: integer
           format: int64
-          example: 1234
+          example: |-
+            1234
           minimum: 1
+          maximum: 999999
         user:
           $ref: '#/components/schemas/User'
         photo:
@@ -1127,12 +1268,17 @@ components:
           description: the comment id
           type: integer
           format: int64
-          example: 1234
+          example: |-
+            1234
           minimum: 1
+          maximum: 999999
         text:
           type: string
           pattern:  'ˆ.*?$'
-          example: U R GORGEOUS!
+          minLength: 1
+          maxLength: 999
+          example: |-
+            U R GORGEOUS!
         user:
           $ref: '#/components/schemas/User'
         photo:
@@ -1146,8 +1292,10 @@ components:
           description: the ban id
           type: integer
           format: int64
-          example: 1234
+          example: |-
+            1234
           minimum: 1
+          maximum: 999999
         user:
           $ref: '#/components/schemas/User'
         banned:
@@ -1161,8 +1309,10 @@ components:
           description: the follow id
           type: integer
           format: int64
-          example: 1234
+          example: |-
+            1234
           minimum: 1
+          maximum: 999999
         user:
           $ref: '#/components/schemas/User'
         followee:
@@ -1188,5 +1338,6 @@ components:
             - 500
         message:
           type: string
-          example: error!
+          example: |-
+            error!
       type: object
