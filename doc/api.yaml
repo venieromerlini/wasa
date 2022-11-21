@@ -4,9 +4,9 @@ servers:
 info:
   description: |-
     Each user will be presented with a stream of photos (images) in reverse chronological order, with information about when each photo was uploaded (date and time  and how many likes and comments it has. The stream is composed by photos from “following” (other users that the user follows).
-   
+    
     Users can place (and later remove) a “like” to photos from other users. Also, users can add comments to any image (even those uploaded by themself).
-  
+    
     Only authors can remove their comments.Users can ban other users. If user Alice bans user Eve, Eve won’t be able to see any information about Alice. Alice can decide to remove the ban at any moment.Users will have their profiles. 
     
     The personal profile page for the user shows: the user’s photos (in reverse chronological order), how many photos have been uploaded, and the user’s followers and following. Users can change their usernames, upload photos, remove photos, and follow/unfollow other users.
@@ -29,7 +29,7 @@ info:
     - deletePhoto
     - getUserProfile
     - getMyStream
-
+    
     
     Some useful links:
     - [project spec ](http://gamificationlab.uniroma1.it/notes/Project.pdf)
@@ -78,11 +78,16 @@ paths:
                 type: object
                 properties:
                   identifier:
-                  # change here if you decide to use an integer
-                  # or any other type of identifier
+                    # change here if you decide to use an integer
+                    # or any other type of identifier
                     type: string
                     example: "abcdef012345"
   /users:
+    parameters:
+      - in: header
+        name: X-user-session-identifier
+        schema:
+          type: string
     get:
       tags:
         - user
@@ -92,11 +97,6 @@ paths:
         The requestor may not have the grant to invoke this api.
         Only json media type is supported.
       operationId: findAllUser
-      parameters:
-        - in: header
-          name: X-user-session-identifier
-          schema:
-            type: string
       responses:
         '200':
           description: ok
@@ -123,6 +123,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApiError'
   /users/{username}:
+    parameters:
+      - in: path
+        name: username
+        description: the username of the user to retrieve
+        required: true
+        schema:
+          type: string
+      - in: header
+        name: X-user-session-identifier
+        schema:
+          type: string
     get:
       tags:
         - user
@@ -132,17 +143,6 @@ paths:
         The requestor may not have the grant to invoke this api.
         Only json media type is supported.
       operationId: getMyStream
-      parameters:
-        - in: path
-          name: username
-          description: the username of the user to retrieve
-          required: true
-          schema:
-            type: string
-        - in: header
-          name: X-user-session-identifier
-          schema:
-            type: string
       responses:
         '200':
           description: ok
@@ -170,6 +170,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApiError'
   /users/{username}/profile:
+    parameters:
+      - in: path
+        name: username
+        description: the username of the user to retrieve
+        required: true
+        schema:
+          type: string
+      - in: header
+        name: X-user-session-identifier
+        schema:
+          type: string
     get:
       tags:
         - private
@@ -180,17 +191,6 @@ paths:
         Only the requestor has the grant to invoke this api.
         Only json media type is supported.
       operationId: getUserProfile
-      parameters:
-        - in: path
-          name: username
-          description: the username of the user to retrieve
-          required: true
-          schema:
-            type: string
-        - in: header
-          name: X-user-session-identifier
-          schema:
-            type: string
       responses:
         '200':
           description: ok
@@ -227,17 +227,6 @@ paths:
         Only the requestor has the grant to invoke this api.
         Only json media type is supported.
       operationId: setMyUserName
-      parameters:
-        - in: path
-          name: username
-          description: the username of the user to retrieve
-          required: true
-          schema:
-            type: string
-        - in: header
-          name: X-user-session-identifier
-          schema:
-            type: string
       requestBody:
         description: The user object containing the username that will be replaced
         required: true
@@ -271,7 +260,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiError'
-  /users/{username}/photos:
+  /photos:
+    parameters:
+      - in: query
+        name: username
+        description: the username of the user to retrieve
+        required: true
+        schema:
+          type: string
+      - in: header
+        name: X-user-session-identifier
+        schema:
+          type: string
     get:
       tags:
         - photo
@@ -282,17 +282,6 @@ paths:
         The requestor may not have the grant to invoke this api.
         Only json media type is supported.
       operationId: findUserPhotos
-      parameters:
-        - in: path
-          name: username
-          description: the username of the user to retrieve
-          required: true
-          schema:
-            type: string
-        - in: header
-          name: X-user-session-identifier
-          schema:
-            type: string
       responses:
         '200':
           description: ok
@@ -328,17 +317,6 @@ paths:
         The requestor may not have the grant to invoke this api.
         Only json media type is supported.
       operationId: uploadPhoto
-      parameters:
-        - in: path
-          name: username
-          description: the username of the user to retrieve
-          required: true
-          schema:
-            type: string
-        - in: header
-          name: X-user-session-identifier
-          schema:
-            type: string
       requestBody:
         description: Uploaded photo
         required: true
@@ -373,7 +351,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiError'
-  /users/{username}/follows:
+  /follows:
+    parameters:
+      - in: query
+        name: username
+        description: the username
+        required: true
+        schema:
+          type: string
+      - in: header
+        name: X-user-session-identifier
+        schema:
+          type: string
     put:
       tags:
         - follow
@@ -384,24 +373,13 @@ paths:
         The requestor may not have the grant to invoke this api.
         Only json media type is supported.
       operationId: followUser
-      parameters:
-        - in: path
-          name: username
-          description: the username of the user to retrieve
-          required: true
-          schema:
-            type: string
-        - in: header
-          name: X-user-session-identifier
-          schema:
-            type: string
       requestBody:
         description: The followee that the user wants to follow
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/Follow'
       responses:
         '201':
           description: Created
@@ -438,17 +416,6 @@ paths:
         The requestor may not have the grant to invoke this api.
         Only json media type is supported.
       operationId: unfollowUser
-      parameters:
-        - in: path
-          name: username
-          description: the username of the user to retrieve
-          required: true
-          schema:
-            type: string
-        - in: header
-          name: X-user-session-identifier
-          schema:
-            type: string
       responses:
         '200':
           description: ok
@@ -475,7 +442,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiError'
-  /users/{username}/bans:
+  /bans:
+    parameters:
+      - in: query
+        name: username
+        description: the username of the user to retrieve
+        required: true
+        schema:
+          type: string
+      - in: header
+        name: X-user-session-identifier
+        schema:
+          type: string
     put:
       tags:
         - ban
@@ -487,24 +465,13 @@ paths:
         The requestor may not have the grant to invoke this api.
         Only json media type is supported.
       operationId: banUser
-      parameters:
-        - in: path
-          name: username
-          description: the username of the user to retrieve
-          required: true
-          schema:
-            type: string
-        - in: header
-          name: X-user-session-identifier
-          schema:
-            type: string
       requestBody:
         description: The followee that the user wants to follow
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/Ban'
       responses:
         '201':
           description: ok
@@ -541,17 +508,6 @@ paths:
         The requestor may not have the grant to invoke this api.
         Only json media type is supported.
       operationId: unbanUser
-      parameters:
-        - in: path
-          name: username
-          description: the username of the user to put back in the follow list
-          required: true
-          schema:
-            type: string
-        - in: header
-          name: X-user-session-identifier
-          schema:
-            type: string
       responses:
         '200':
           description: ok
@@ -571,7 +527,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiError'
-  /users/{username}/photos/{photoId}:
+  /photos/{photoId}:
+    parameters:
+      - in: query
+        name: username
+        description: the username of the user
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: photoId
+        description: the photo id
+        required: true
+        schema:
+          type: string
+      - in: header
+        name: X-user-session-identifier
+        schema:
+          type: string
     get:
       tags:
         - photo
@@ -581,23 +554,6 @@ paths:
         The requestor may not have the grant to invoke this api.
         Only json media type is supported.
       operationId: findUserPhoto
-      parameters:
-        - in: path
-          name: username
-          description: the username of the user
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: photoId
-          description: the photo id 
-          required: true
-          schema:
-            type: string
-        - in: header
-          name: X-user-session-identifier
-          schema:
-            type: string
       responses:
         '200':
           description: Successful operation
@@ -623,8 +579,25 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiError'            
-  /users/{username}/photos/{photoId}/likes:
+                $ref: '#/components/schemas/ApiError'
+  /likes:
+    parameters:
+      - in: query
+        name: username
+        description: the username of the user
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: photoId
+        description: the photo id
+        required: true
+        schema:
+          type: string
+      - in: header
+        name: X-user-session-identifier
+        schema:
+          type: string
     put:
       tags:
         - like
@@ -636,30 +609,13 @@ paths:
         The requestor may not have the grant to invoke this api.
         Only json media type is supported.
       operationId: likePhoto
-      parameters:
-        - in: path
-          name: username
-          description: the username of the user
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: photoId
-          description: the photo id 
-          required: true
-          schema:
-            type: string
-        - in: header
-          name: X-user-session-identifier
-          schema:
-            type: string
       requestBody:
         description: The user that issue a like on the photo of the user
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/Like'
       responses:
         '201':
           description: Created
@@ -696,23 +652,6 @@ paths:
         The requestor may not have the grant to invoke this api.
         Only json media type is supported.
       operationId: deletePhoto
-      parameters:
-        - in: path
-          name: username
-          description: the username of the user
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: photoId
-          description: the photo id
-          required: true
-          schema:
-            type: string
-        - in: header
-          name: X-user-session-identifier
-          schema:
-            type: string
       responses:
         '200':
           description: Successful operation
@@ -732,7 +671,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiError'
-  /users/{username}/photos/{photoId}/likes/{likeId}:
+  /likes/{likeId}:
+    parameters:
+      - in: query
+        name: username
+        description: the username of the user
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: photoId
+        description: the photo id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: likeId
+        description: the like id
+        required: true
+        schema:
+          type: string
+      - in: header
+        name: X-user-session-identifier
+        schema:
+          type: string
     delete:
       tags:
         - like
@@ -743,29 +705,6 @@ paths:
         The requestor may not have the grant to invoke this api.
         Only json media type is supported.
       operationId: unlikePhoto
-      parameters:
-        - in: path
-          name: username
-          description: the username of the user
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: photoId
-          description: the photo id 
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: likeId
-          description: the like id 
-          required: true
-          schema:
-            type: string
-        - in: header
-          name: X-user-session-identifier
-          schema:
-            type: string
       responses:
         '200':
           description: Successful operation
@@ -784,8 +723,25 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiError'   
-  /users/{username}/photos/{photoId}/comments:
+                $ref: '#/components/schemas/ApiError'
+  /comments:
+    parameters:
+      - in: query
+        name: username
+        description: the username of the user
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: photoId
+        description: the photo id
+        required: true
+        schema:
+          type: string
+      - in: header
+        name: X-user-session-identifier
+        schema:
+          type: string
     put:
       tags:
         - comment
@@ -796,23 +752,6 @@ paths:
         The requestor may not have the grant to invoke this api.
         Only json media type is supported.
       operationId: commentPhoto
-      parameters:
-        - in: path
-          name: username
-          description: the username of the user
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: photoId
-          description: the photo id 
-          required: true
-          schema:
-            type: string
-        - in: header
-          name: X-user-session-identifier
-          schema:
-            type: string
       requestBody:
         description: The user that issue a like on the photo of the user
         required: true
@@ -845,8 +784,31 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiError'   
-  /users/{username}/photos/{photoId}/comments/{commentId}:
+                $ref: '#/components/schemas/ApiError'
+  /comments/{commentId}:
+    parameters:
+      - in: query
+        name: username
+        description: the username of the user
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: photoId
+        description: the photo id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: commentId
+        description: the comment id
+        required: true
+        schema:
+          type: string
+      - in: header
+        name: X-user-session-identifier
+        schema:
+          type: string
     delete:
       tags:
         - comment
@@ -856,29 +818,6 @@ paths:
         The requestor may not have the grant to invoke this api.
         Only json media type is supported.
       operationId: uncommentPhoto
-      parameters:
-        - in: path
-          name: username
-          description: the username of the user
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: photoId
-          description: the photo id 
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: commentId
-          description: the comment id 
-          required: true
-          schema:
-            type: string
-        - in: header
-          name: X-user-session-identifier
-          schema:
-            type: string
       responses:
         '200':
           description: Successful operation
@@ -897,7 +836,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiError'  
+                $ref: '#/components/schemas/ApiError'
 externalDocs:
   description: Find out more about Swagger
   url: 'http://swagger.io'
@@ -917,7 +856,7 @@ components:
           pattern: '^[a-zA-Z0-9_.-]*$'
       type: object
     Followee:
-      description: Schema representing a followed user. 
+      description: Schema representing a followed user.
       x-swagger-router-model: it.uniroma1.wasa.venieromerlini.model.Followee
       properties:
         id:
@@ -1085,15 +1024,13 @@ components:
         id:
           type: integer
           enum:
-          - 400
-          - 401
-          - 404
-          - 405
-          - 415
-          - 500
+            - 400
+            - 401
+            - 404
+            - 405
+            - 415
+            - 500
         message:
           type: string
           example: error!
       type: object
-      
-      
