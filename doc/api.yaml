@@ -63,6 +63,7 @@ paths:
               type: object
               properties:
                 name:
+                  description: username description
                   type: string
                   example: Veniero
                   pattern: 'ˆ.*?$'
@@ -86,6 +87,7 @@ paths:
     parameters:
       - in: header
         name: X-user-session-identifier
+        description: session identifier
         schema:
           type: string
     get:
@@ -132,6 +134,7 @@ paths:
           type: string
       - in: header
         name: X-user-session-identifier
+        description: session identifier
         schema:
           type: string
     get:
@@ -179,6 +182,7 @@ paths:
           type: string
       - in: header
         name: X-user-session-identifier
+        description: session identifier
         schema:
           type: string
     get:
@@ -270,6 +274,7 @@ paths:
           type: string
       - in: header
         name: X-user-session-identifier
+        description: session identifier
         schema:
           type: string
     get:
@@ -360,6 +365,7 @@ paths:
         schema:
           type: string
       - in: header
+        description: session identifier
         name: X-user-session-identifier
         schema:
           type: string
@@ -451,6 +457,7 @@ paths:
         schema:
           type: string
       - in: header
+        description: session identifier
         name: X-user-session-identifier
         schema:
           type: string
@@ -542,6 +549,7 @@ paths:
         schema:
           type: string
       - in: header
+        description: session identifier
         name: X-user-session-identifier
         schema:
           type: string
@@ -595,6 +603,7 @@ paths:
         schema:
           type: string
       - in: header
+        description: session identifier
         name: X-user-session-identifier
         schema:
           type: string
@@ -692,6 +701,7 @@ paths:
         schema:
           type: string
       - in: header
+        description: session identifier
         name: X-user-session-identifier
         schema:
           type: string
@@ -739,6 +749,7 @@ paths:
         schema:
           type: string
       - in: header
+        description: session identifier
         name: X-user-session-identifier
         schema:
           type: string
@@ -808,7 +819,9 @@ paths:
       - in: header
         name: X-user-session-identifier
         schema:
+          description: session identifier
           type: string
+          pattern:  'ˆ.*?$'
     delete:
       tags:
         - comment
@@ -843,28 +856,21 @@ externalDocs:
 components:
   schemas:
     User:
+      description: it represents a user of the WASAPhoto Social Network
       x-swagger-router-model: it.uniroma1.wasa.venieromerlini.model.User
       properties:
-        id:
-          type: integer
-          format: int64
-          example: 1234
-          minimum: 1
         username:
+          description: the username of the user, it is unique
           type: string
           example: theUser
           pattern: '^[a-zA-Z0-9_.-]*$'
       type: object
     Followee:
-      description: Schema representing a followed user.
+      description: it represents a followed user
       x-swagger-router-model: it.uniroma1.wasa.venieromerlini.model.Followee
       properties:
-        id:
-          type: integer
-          format: int64
-          example: 5678
-          minimum: 1
         username:
+          description: the username of the user, it is unique
           type: string
           example: theFollowedUser
           pattern: '^[a-zA-Z0-9_.-]*$'
@@ -873,89 +879,108 @@ components:
       description: Schema representing a banned user.
       x-swagger-router-model: it.uniroma1.wasa.venieromerlini.model.Banned
       properties:
-        id:
-          type: integer
-          format: int64
-          example: 9101
-          minimum: 1
         username:
+          description: the username of the user, it is unique
           type: string
           example: theBanneduser
           pattern: '^[a-zA-Z0-9_.-]*$'
       type: object
     Users:
+      description: it represents a list of users
       type: array
       items:
+        description: the user array
         $ref: '#/components/schemas/User'
     Photo:
+      description: it represents a photo uploaded by a user
       x-swagger-router-model: it.uniroma1.wasa.venieromerlini.model.Photo
       properties:
         id:
+          description: the photo id
           type: integer
           format: int64
           example: 1234
           minimum: 1
         user:
+          description: the owner of the photo
           $ref: '#/components/schemas/User'
         likes:
+          description: the likes received for this photo
           type: array
           items:
             $ref: '#/components/schemas/Like'
         comments:
+          description: the comments received for this photo
           type: array
           items:
             $ref: '#/components/schemas/Comment'
         data:
+          description: base64 data photo
+          pattern:  'ˆ.*?$'
+          example: iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAB
           type: string
           format: byte
-          description: base64 data photo
-          example: iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAB
         uploadDate:
+          description: the upload date for this photo
+          pattern:  'ˆ.*?$'
           type: string
           format: date-time
       type: object
     Photos:
+      description: it represents a list of photos.
       type: array
       items:
+        description: the photos array
         $ref: '#/components/schemas/Photo'
     Profile:
+      description: it represents the profile data of user. It contains not public informations
       x-swagger-router-model: it.uniroma1.wasa.venieromerlini.model.Profile
       properties:
         id:
+          description: the profile id
           type: integer
           format: int64
           example: 1234
           minimum: 1
         user:
+          description: the user, owner of this profile
           $ref: '#/components/schemas/User'
         photos:
+          description: the photos of the user
           type: array
           items:
             $ref: '#/components/schemas/Photo'
         followees:
+          description: the users that follows the user
           type: array
           items:
             $ref: '#/components/schemas/Follow'
         followers:
+          description: the user's followers
           type: array
           items:
             $ref: '#/components/schemas/Follow'
       type: object
     UserHomePage:
+      description: it represents the data . It contains not public informations
       x-swagger-router-model: it.uniroma1.wasa.venieromerlini.model.UserHomePage
       properties:
         id:
+          description: the homepage id
           type: integer
           format: int64
           example: 1234
           minimum: 1
         user:
+          description: the homepage user
           $ref: '#/components/schemas/User'
         photos:
+          description: the photos beloning to the user's followees
           type: array
           items:
             $ref: '#/components/schemas/Photo'
         followees:
+          description: the user followees
           type: array
           items:
             $ref: '#/components/schemas/Follow'
@@ -964,19 +989,23 @@ components:
       x-swagger-router-model: it.uniroma1.wasa.venieromerlini.model.Like
       properties:
         id:
+          description: the like id
           type: integer
           format: int64
           example: 1234
           minimum: 1
         user:
+          description: the user that habe put a like
           $ref: '#/components/schemas/User'
         photo:
+          description: the liked photo
           $ref: '#/components/schemas/Photo'
       type: object
     Comment:
       x-swagger-router-model: it.uniroma1.wasa.venieromerlini.model.Comment
       properties:
         id:
+          description: the comment id
           type: integer
           format: int64
           example: 1234
@@ -985,43 +1014,56 @@ components:
           type: string
           example: U R GORGEOUS!
         user:
+          description: the user that commented the photo
           $ref: '#/components/schemas/User'
         photo:
+          description: the commented photo
           $ref: '#/components/schemas/Photo'
       type: object
     Ban:
       x-swagger-router-model: it.uniroma1.wasa.venieromerlini.model.Ban
+      description: it represents a Ban, a user banning another user
       properties:
         id:
+          description: the ban id
           type: integer
           format: int64
           example: 1234
           minimum: 1
         user:
+          description: the "banning" user
           $ref: '#/components/schemas/User'
         banned:
+          description: the banned user
           $ref: '#/components/schemas/Banned'
       type: object
     Follow:
+      description: it represents a Follow, a user following another user
       x-swagger-router-model: it.uniroma1.wasa.venieromerlini.model.Follow
       properties:
         id:
+          description: the follow id
           type: integer
           format: int64
           example: 1234
           minimum: 1
         user:
+          description: the "following" user
           $ref: '#/components/schemas/User'
         followee:
+          description: the followed user
           $ref: '#/components/schemas/Followee'
       type: object
     EmptyReponse:
+      description: it represents an empty response, used for delete api
       x-swagger-router-model: it.uniroma1.wasa.venieromerlini.model.EmptyResponse
       type: object
     ApiError:
+      description: it represents the response used in case of errors
       x-swagger-router-model: it.uniroma1.wasa.venieromerlini.model.ApiError
       properties:
         id:
+          description: the error code
           type: integer
           enum:
             - 400
