@@ -93,6 +93,8 @@ paths:
                     # change here if you decide to use an integer
                     # or any other type of identifier
                     type: string
+                    minLength: 3
+                    maxLength: 16
                     example: |-
                       abcdef012345
   /home/{username}:
@@ -129,6 +131,8 @@ paths:
         The requestor may not have the grant to invoke this api.
         Only json media type is supported.
       operationId: getMyStream
+      security:
+        - bearerAuth: []
       responses:
         '200':
           description: ok
@@ -163,6 +167,8 @@ paths:
           session identifier
         schema:
           type: string
+          minLength: 3
+          maxLength: 180
           pattern:  '^[a-zA-Z0-9_.-]*$'
           example:  |-
             theUserInSession
@@ -175,6 +181,8 @@ paths:
         The requestor may not have the grant to invoke this api.
         Only json media type is supported.
       operationId: findAllUser
+      security:
+        - bearerAuth: []
       responses:
         '200':
           description: ok
@@ -237,6 +245,8 @@ paths:
         Only the requestor has the grant to invoke this api.
         Only json media type is supported.
       operationId: getUserProfile
+      security:
+        - bearerAuth: []
       responses:
         '200':
           description: ok
@@ -272,6 +282,8 @@ paths:
         Only the requestor has the grant to invoke this api.
         Only json media type is supported.
       operationId: setMyUserName
+      security:
+        - bearerAuth: []
       requestBody:
         description: The user object containing the username that will be replaced
         required: true
@@ -339,6 +351,8 @@ paths:
         The requestor may not have the grant to invoke this api.
         Only json media type is supported.
       operationId: findUserPhotos
+      security:
+        - bearerAuth: []
       responses:
         '200':
           description: ok
@@ -378,6 +392,8 @@ paths:
         The requestor may not have the grant to invoke this api.
         Only json media type is supported.
       operationId: uploadPhoto
+      security:
+        - bearerAuth: []
       requestBody:
         description: Uploaded photo
         required: true
@@ -390,6 +406,8 @@ paths:
                   description: |-
                     file to upload
                   type: string
+                  minLength: 0
+                  maxLength: 999999999999
                   format: binary
       responses:
         '201':
@@ -463,6 +481,8 @@ paths:
         The requestor may not have the grant to invoke this api.
         Only json media type is supported.
       operationId: findUserPhoto
+      security:
+        - bearerAuth: []
       responses:
         '200':
           description: Successful operation
@@ -499,6 +519,8 @@ paths:
         The requestor may not have the grant to invoke this api.
         Only json media type is supported.
       operationId: deletePhoto
+      security:
+        - bearerAuth: []
       responses:
         '200':
           description: Successful operation
@@ -553,6 +575,8 @@ paths:
         The requestor may not have the grant to invoke this api.
         Only json media type is supported.
       operationId: followUser
+      security:
+        - bearerAuth: []
       requestBody:
         description: The followee that the user wants to follow
         required: true
@@ -634,6 +658,8 @@ paths:
         The requestor may not have the grant to invoke this api.
         Only json media type is supported.
       operationId: unfollowUser
+      security:
+        - bearerAuth: []
       responses:
         '200':
           description: ok
@@ -696,6 +722,8 @@ paths:
         The requestor may not have the grant to invoke this api.
         Only json media type is supported.
       operationId: banUser
+      security:
+        - bearerAuth: []
       requestBody:
         description: The followee that the user wants to follow
         required: true
@@ -776,6 +804,8 @@ paths:
         The requestor may not have the grant to invoke this api.
         Only json media type is supported.
       operationId: unbanUser
+      security:
+        - bearerAuth: []
       responses:
         '200':
           description: ok
@@ -841,6 +871,8 @@ paths:
         The requestor may not have the grant to invoke this api.
         Only json media type is supported.
       operationId: likePhoto
+      security:
+        - bearerAuth: []
       requestBody:
         description: The user that issue a like on the photo of the user
         required: true
@@ -932,6 +964,8 @@ paths:
         The requestor may not have the grant to invoke this api.
         Only json media type is supported.
       operationId: unlikePhoto
+      security:
+        - bearerAuth: []
       responses:
         '200':
           description: Successful operation
@@ -997,6 +1031,8 @@ paths:
         The requestor may not have the grant to invoke this api.
         Only json media type is supported.
       operationId: commentPhoto
+      security:
+        - bearerAuth: []
       requestBody:
         description: The user that issue a like on the photo of the user
         required: true
@@ -1087,6 +1123,8 @@ paths:
         The requestor may not have the grant to invoke this api.
         Only json media type is supported.
       operationId: uncommentPhoto
+      security:
+        - bearerAuth: []
       responses:
         '200':
           description: Successful operation
@@ -1118,6 +1156,8 @@ components:
           example: |-
             theUser
           pattern: '^[a-zA-Z0-9_.-]*$'
+          minLength: 3
+          maxLength: 16
       type: object
     Followee:
       description: it represents a followed user
@@ -1129,6 +1169,8 @@ components:
           example: |-
             theFollowedUser
           pattern: '^[a-zA-Z0-9_.-]*$'
+          minLength: 3
+          maxLength: 16
       type: object
     Banned:
       description: Schema representing a banned user.
@@ -1140,6 +1182,8 @@ components:
           example: |-
             theBanneduser
           pattern: '^[a-zA-Z0-9_.-]*$'
+          minLength: 3
+          maxLength: 180
       type: object
     Photo:
       description: it represents a photo uploaded by a user
@@ -1149,8 +1193,7 @@ components:
           description: the photo id
           type: integer
           format: int64
-          example: |-
-            1234
+          example: 1234
           minimum: 1
           maximum: 999999
         user:
@@ -1175,14 +1218,15 @@ components:
           example: |-
             iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAB
           type: string
-          format: byte
         uploadDate:
           description: the upload date for this photo
           pattern: '^[a-zA-Z0-9_.-]*$'
           example: |-
-            01-01-2022
+            20220101
           type: string
           format: date-time
+          minLength: 8
+          maxLength: 8
       type: object
     Profile:
       description: it represents the profile data of user. It contains not public informations
@@ -1192,8 +1236,7 @@ components:
           description: the profile id
           type: integer
           format: int64
-          example: |-
-            1234
+          example: 1234
           minimum: 1
           maximum: 999999
         user:
@@ -1228,8 +1271,7 @@ components:
           description: the homepage id
           type: integer
           format: int64
-          example: |-
-            1234
+          example: 1234
           minimum: 1
           maximum: 999999
         user:
@@ -1256,8 +1298,7 @@ components:
           description: the like id
           type: integer
           format: int64
-          example: |-
-            1234
+          example: 1234
           minimum: 1
           maximum: 999999
         user:
@@ -1272,8 +1313,7 @@ components:
           description: the comment id
           type: integer
           format: int64
-          example: |-
-            1234
+          example: 1234
           minimum: 1
           maximum: 999999
         text:
@@ -1296,8 +1336,7 @@ components:
           description: the ban id
           type: integer
           format: int64
-          example: |-
-            1234
+          example: 1234
           minimum: 1
           maximum: 999999
         user:
@@ -1313,8 +1352,7 @@ components:
           description: the follow id
           type: integer
           format: int64
-          example: |-
-            1234
+          example: 1234
           minimum: 1
           maximum: 999999
         user:
@@ -1344,3 +1382,8 @@ components:
           example: |-
             error!
       type: object
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
