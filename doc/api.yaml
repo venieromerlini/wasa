@@ -68,6 +68,8 @@ paths:
         content:
           application/json:
             schema:
+              description:  |-
+                login response description
               type: object
               properties:
                 name:
@@ -105,6 +107,8 @@ paths:
           the username of the user to retrieve
         required: true
         schema:
+          description: |-
+            the username of the user to retrieve
           type: string
           pattern:  '^[a-zA-Z0-9_.-]*$'
           example:  |-
@@ -116,6 +120,8 @@ paths:
         description: |-
           session identifier
         schema:
+          description: |-
+            session identifier
           type: string
           pattern:  '^[a-zA-Z0-9_.-]*$'
           minLength: 3
@@ -166,6 +172,8 @@ paths:
         description:  |-
           session identifier
         schema:
+          description:  |-
+            session identifier
           type: string
           minLength: 3
           maxLength: 180
@@ -189,6 +197,8 @@ paths:
           content:
             application/json:
               schema:
+                description:  |-
+                  users returned from the server
                 type: array
                 minItems: 0
                 maxItems: 999999
@@ -359,6 +369,8 @@ paths:
           content:
             application/json:
               schema:
+                description:  |-
+                  photos returned from the server
                 type: array
                 minItems: 0
                 maxItems: 999999
@@ -400,6 +412,8 @@ paths:
         content:
           multipart/form-data:
             schema:
+              description:  |-
+                photo to be uploaded
               type: object
               properties:
                 file:
