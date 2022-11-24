@@ -74,7 +74,7 @@ paths:
               properties:
                 name:
                   description:  |-
-                    username description
+                    user name
                   type: string
                   example: |-
                     Veniero
@@ -88,17 +88,7 @@ paths:
           content:
             application/json:
               schema:
-                description: the success log response
-                type: object
-                properties:
-                  identifier:
-                    # change here if you decide to use an integer
-                    # or any other type of identifier
-                    type: string
-                    minLength: 3
-                    maxLength: 16
-                    example: |-
-                      abcdef012345
+                $ref: '#/components/schemas/SuccessfulLogin'
   /home/{username}:
     parameters:
       - in: path
@@ -1172,9 +1162,9 @@ components:
         username:
           description: the username of the user, it is unique
           type: string
+          pattern: '^[a-zA-Z0-9_.-]*$'
           example: |-
             theUser
-          pattern: '^[a-zA-Z0-9_.-]*$'
           minLength: 3
           maxLength: 16
       type: object
@@ -1183,7 +1173,8 @@ components:
       x-swagger-router-model: it.uniroma1.wasa.venieromerlini.model.Followee
       properties:
         username:
-          description: the username of the user, it is unique
+          description: |-
+            the username of the user, it is unique
           type: string
           example: |-
             theFollowedUser
@@ -1196,7 +1187,8 @@ components:
       x-swagger-router-model: it.uniroma1.wasa.venieromerlini.model.Banned
       properties:
         username:
-          description: the username of the user, it is unique
+          description: |-
+            the username of the user, it is unique
           type: string
           example: |-
             theBanneduser
@@ -1209,7 +1201,8 @@ components:
       x-swagger-router-model: it.uniroma1.wasa.venieromerlini.model.Photo
       properties:
         id:
-          description: the photo id
+          description: |-
+            the photo id
           type: integer
           format: int64
           example: 1234
@@ -1342,7 +1335,7 @@ components:
           maximum: 999999
         text:
           type: string
-          pattern: '^[a-zA-Z0-9_.-]*$'
+          pattern: '^[a-zA-Z0-9_.?!,. -]*$'
           minLength: 1
           maxLength: 999
           example: |-
@@ -1407,10 +1400,26 @@ components:
             - 405
             - 415
         message:
+          description: |-
+            message error
           type: string
           example: |-
             error!
       type: object
+    SuccessfulLogin:
+      description: the success log response
+      type: object
+      properties:
+        identifier:
+          # change here if you decide to use an integer
+          # or any other type of identifier
+          description: |-
+            identifier
+          type: string
+          minLength: 3
+          maxLength: 16
+          example: |-
+            abcdef012345
   securitySchemes:
     bearerAuth:
       type: http
