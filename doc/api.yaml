@@ -90,33 +90,8 @@ paths:
                 $ref: '#/components/schemas/SuccessfulLogin'
   /home/{username}:
     parameters:
-      - in: path
-        name: username
-        description: |-
-          the username of the user to retrieve
-        required: true
-        schema:
-          description: |-
-            the username of the user to retrieve
-          type: string
-          pattern:  '^[a-zA-Z0-9_.-]*$'
-          example:  |-
-            theUserName
-          minLength: 3
-          maxLength: 16
-      - in: header
-        name: X-user-session-identifier
-        description: |-
-          session identifier
-        schema:
-          description: |-
-            session identifier
-          type: string
-          pattern:  '^[a-zA-Z0-9_.-]*$'
-          minLength: 3
-          maxLength: 180
-          example:  |-
-            theUserName
+      - $ref: '#/components/parameters/usernamePathParam'
+      - $ref: '#/components/parameters/X-user-session-identifier'
     get:
       tags:
         - user
@@ -129,46 +104,13 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
-          description: ok
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserHomePage'
-        '401':
-          description: Not Authorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '404':
-          description: Not found
-          # this error could happen if the user has been canceled before invoking this api
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '415':
-          description: Unsupported Media Type
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
+        '200': {$ref: '#/components/responses/200UserHomePage'}
+        '401': {$ref: '#/components/responses/401'}
+        '404': {$ref: '#/components/responses/404'}
+        '415': {$ref: '#/components/responses/415'}
   /users:
     parameters:
-      - in: header
-        name: X-user-session-identifier
-        description:  |-
-          session identifier
-        schema:
-          description:  |-
-            session identifier
-          type: string
-          minLength: 3
-          maxLength: 180
-          pattern:  '^[a-zA-Z0-9_.-]*$'
-          example:  |-
-            theUserInSession
+      - $ref: '#/components/parameters/X-user-session-identifier'
     get:
       tags:
         - user
@@ -181,60 +123,14 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
-          description: ok
-          content:
-            application/json:
-              schema:
-                description:  |-
-                  users returned from the server
-                type: array
-                minItems: 0
-                maxItems: 999999
-                items:
-                  $ref: '#/components/schemas/User'
-        '401':
-          description: Not Authorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '405':
-          description: Method Not Allowed
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '415':
-          description: Unsupported Media Type
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
+        '200': {$ref: '#/components/responses/200Users'}
+        '401': {$ref: '#/components/responses/401'}
+        '405': {$ref: '#/components/responses/405'}
+        '415': {$ref: '#/components/responses/415'}
   /users/{username}:
     parameters:
-      - in: path
-        name: username
-        description: the username of the user to retrieve
-        required: true
-        schema:
-          type: string
-          pattern:  '^[a-zA-Z0-9_.-]*$'
-          minLength: 3
-          maxLength: 16
-          example:  |-
-            theUserName
-      - in: header
-        name: X-user-session-identifier
-        description:  |-
-          session identifier
-        schema:
-          type: string
-          pattern:  '^[a-zA-Z0-9_.-]*$'
-          minLength: 3
-          maxLength: 180
-          example:  |-
-            theUserInSession
+      - $ref: '#/components/parameters/usernamePathParam'
+      - $ref: '#/components/parameters/X-user-session-identifier'
     get:
       tags:
         - user
@@ -247,32 +143,11 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
-          description: ok
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Profile'
-        '401':
-          description: Not Authorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '404':
-          description: Not found
-          # this error could happen if the user has been canceled before invoking this api
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '415':
-          description: Unsupported Media Type
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-    patch:
+        '200': {$ref: '#/components/responses/200Profile'}
+        '401': {$ref: '#/components/responses/401'}
+        '404': {$ref: '#/components/responses/404'}
+        '415': {$ref: '#/components/responses/415'}
+    put:
       tags:
         - user
       summary: update username
@@ -291,55 +166,14 @@ paths:
             schema:
               $ref: '#/components/schemas/User'
       responses:
-        '200':
-          description: ok
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Profile'
-        '401':
-          description: Not Authorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '404':
-          description: Not found
-          # this error could happen if the user has been canceled before invoking this api
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '415':
-          description: Unsupported Media Type
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
+        '200': {$ref: '#/components/responses/200Profile'}
+        '401': {$ref: '#/components/responses/401'}
+        '404': {$ref: '#/components/responses/404'}
+        '415': {$ref: '#/components/responses/415'}
   /photos:
     parameters:
-      - in: query
-        name: username
-        description: the username of the user to retrieve
-        required: true
-        schema:
-          type: string
-          pattern:  '^[a-zA-Z0-9_.-]*$'
-          example:  |-
-            theUser
-          minLength: 3
-          maxLength: 16
-      - in: header
-        name: X-user-session-identifier
-        description: |-
-          session identifier
-        schema:
-          type: string
-          pattern:  '^[a-zA-Z0-9_.-]*$'
-          minLength: 3
-          maxLength: 180
-          example: |-
-            theUserInSession
+      - $ref: '#/components/parameters/usernameQueryParam'
+      - $ref: '#/components/parameters/X-user-session-identifier'
     get:
       tags:
         - photo
@@ -353,37 +187,10 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
-          description: ok
-          content:
-            application/json:
-              schema:
-                description:  |-
-                  photos returned from the server
-                type: array
-                minItems: 0
-                maxItems: 999999
-                items:
-                  $ref: '#/components/schemas/Photo'
-        '401':
-          description: Not Authorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '404':
-          description: Not found
-          # this error could happen if the user has been canceled before invoking this api
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '415':
-          description: Unsupported Media Type
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
+        '200': {$ref: '#/components/responses/200Photos'}
+        '401': {$ref: '#/components/responses/401'}
+        '404': {$ref: '#/components/responses/404'}
+        '415': {$ref: '#/components/responses/415'}
     post:
       tags:
         - photo
@@ -413,68 +220,14 @@ paths:
                   maxLength: 999999999999
                   format: binary
       responses:
-        '201':
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Photo'
-        '401':
-          description: Not Authorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '404':
-          description: Not found
-          # this error could happen if the user has been canceled before invoking this api
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '415':
-          description: Unsupported Media Type
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
+        '201': {$ref: '#/components/responses/201Photo'}
+        '401': {$ref: '#/components/responses/401'}
+        '404': {$ref: '#/components/responses/404'}
+        '415': {$ref: '#/components/responses/415'}
   /photos/{photoId}:
     parameters:
-      - in: query
-        name: username
-        description: |-
-          the username of the user
-        required: true
-        schema:
-          type: string
-          pattern:  '^[a-zA-Z0-9_.-]*$'
-          minLength: 3
-          maxLength: 16
-          example: |-
-            theUser
-      - in: path
-        name: photoId
-        description: |-
-          the photo id
-        required: true
-        schema:
-          type: string
-          pattern:  '^[a-zA-Z0-9_.-]*$'
-          minLength: 1
-          maxLength: 32
-          example: |-
-            10
-      - in: header
-        name: X-user-session-identifier
-        description: |-
-          session identifier
-        schema:
-          type: string
-          pattern:  '^[a-zA-Z0-9_.-]*$'
-          minLength: 3
-          maxLength: 180
-          example: |-
-            theUserInSession
+      - $ref: '#/components/parameters/photoIdPathParam'
+      - $ref: '#/components/parameters/X-user-session-identifier'
     get:
       tags:
         - photo
@@ -487,31 +240,10 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Photo'
-        '401':
-          description: Not Authorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '404':
-          description: Not found
-          # this error could happen if either the user or the photo have been canceled before invoking this api
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '415':
-          description: Unsupported Media Type
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
+        '200': {$ref: '#/components/responses/200Photo'}
+        '401': {$ref: '#/components/responses/401'}
+        '404': {$ref: '#/components/responses/404'}
+        '415': {$ref: '#/components/responses/415'}
     delete:
       tags:
         - photo
@@ -525,53 +257,17 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EmptyReponse'
-        '401':
-          description: Not Authorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '415':
-          description: Unsupported Media Type
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
+        '200': {$ref: '#/components/responses/200Empty'}
+        '401': {$ref: '#/components/responses/401'}
+        '415': {$ref: '#/components/responses/415'}
   /follows:
     parameters:
-      - in: query
-        name: username
-        description: |-
-          the username
-        required: true
-        schema:
-          type: string
-          pattern:  '^[a-zA-Z0-9_.-]*$'
-          minLength: 3
-          maxLength: 16
-          example: |-
-            theUser
-      - in: header
-        description: |-
-          session identifier
-        name: X-user-session-identifier
-        schema:
-          type: string
-          pattern:  '^[a-zA-Z0-9_.-]*$'
-          minLength: 3
-          maxLength: 180
-          example: |-
-            theUserInSession
+      - $ref: '#/components/parameters/usernameQueryParam'
+      - $ref: '#/components/parameters/X-user-session-identifier'
     post:
       tags:
         - follow
-      summary: follow another user
+      summary: find all follow relations
       description: |-
         Start following the activities of another user.
         If the API succeed, a newly create "Follow" object is responded to the client.
@@ -588,69 +284,16 @@ paths:
             schema:
               $ref: '#/components/schemas/Follow'
       responses:
-        '201':
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Follow'
-        '401':
-          description: Not Authorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '404':
-          description: Not found
-          # this error could happen if the user has been canceled before invoking this api
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '415':
-          description: Unsupported Media Type
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
+        '201': {$ref: '#/components/responses/201Follow'}
+        '401': {$ref: '#/components/responses/401'}
+        '404': {$ref: '#/components/responses/404'}
+        '415': {$ref: '#/components/responses/415'}
 
   /follows/{followId}:
     parameters:
-      - in: path
-        name: followId
-        description: |-
-          the follow id to be deleted
-        required: true
-        schema:
-          type: string
-          pattern:  '^[a-zA-Z0-9_.-]*$'
-          example: |-
-            10
-          minLength: 1
-          maxLength: 32
-      - in: query
-        name: username
-        description: |-
-          the username
-        required: true
-        schema:
-          type: string
-          pattern:  '^[a-zA-Z0-9_.-]*$'
-          minLength: 3
-          maxLength: 16
-          example: |-
-            theUser
-      - in: header
-        description: |-
-          session identifier
-        name: X-user-session-identifier
-        schema:
-          type: string
-          pattern:  '^[a-zA-Z0-9_.-]*$'
-          minLength: 3
-          maxLength: 180
-          example: |-
-            theUserInSession
+      - $ref: '#/components/parameters/usernameQueryParam'
+      - $ref: '#/components/parameters/X-user-session-identifier'
+      - $ref: '#/components/parameters/followId'
     delete:
       tags:
         - follow
@@ -664,56 +307,14 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
-          description: ok
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EmptyReponse'
-        '401':
-          description: Not Authorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '404':
-          description: Not found
-          # this error could happen if the following user has been canceled before invoking this api
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '415':
-          description: Unsupported Media Type
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
+        '200': {$ref: '#/components/responses/200Empty'}
+        '401': {$ref: '#/components/responses/401'}
+        '404': {$ref: '#/components/responses/404'}
+        '415': {$ref: '#/components/responses/415'}
   /bans:
     parameters:
-      - in: query
-        name: username
-        description: |-
-          the user for which we are asking the banlist
-        required: true
-        schema:
-          type: string
-          pattern:  '^[a-zA-Z0-9_.-]*$'
-          minLength: 3
-          maxLength: 16
-          example: |-
-            theUser
-      - in: header
-        description: |-
-          session identifier
-        name: X-user-session-identifier
-        schema:
-          type: string
-          pattern:  '^[a-zA-Z0-9_.-]*$'
-          minLength: 3
-          maxLength: 180
-          example: |-
-            theUserInSession
+      - $ref: '#/components/parameters/usernameQueryParam'
+      - $ref: '#/components/parameters/X-user-session-identifier'
     post:
       tags:
         - ban
@@ -735,68 +336,14 @@ paths:
             schema:
               $ref: '#/components/schemas/Ban'
       responses:
-        '201':
-          description: ok
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Ban'
-        '401':
-          description: Not Authorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '404':
-          description: Not found
-          # this error could happen if the banning user has been canceled before invoking this api
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '415':
-          description: Unsupported Media Type
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
+        '201': {$ref: '#/components/responses/201Ban'}
+        '401': {$ref: '#/components/responses/401'}
+        '404': {$ref: '#/components/responses/404'}
+        '415': {$ref: '#/components/responses/415'}
   /bans/{banId}:
     parameters:
-      - in: path
-        name: banId
-        description: |-
-          the ban id to be deleted
-        required: true
-        schema:
-          type: string
-          pattern:  '^[a-zA-Z0-9_.-]*$'
-          minLength: 1
-          maxLength: 32
-          example: |-
-            10
-      - in: query
-        name: username
-        description: |-
-          the username of the user to retrieve
-        required: true
-        schema:
-          type: string
-          pattern:  '^[a-zA-Z0-9_.-]*$'
-          minLength: 3
-          maxLength: 16
-          example: |-
-            theUser
-      - in: header
-        description: |-
-          session identifier
-        name: X-user-session-identifier
-        schema:
-          type: string
-          minLength: 3
-          maxLength: 180
-          pattern:  '^[a-zA-Z0-9_.-]*$'
-          example: |-
-            theUserInSession
+      - $ref: '#/components/parameters/X-user-session-identifier'
+      - $ref: '#/components/parameters/banId'
     delete:
       tags:
         - ban
@@ -810,61 +357,13 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
-          description: ok
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EmptyReponse'
-        '401':
-          description: Not Authorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '415':
-          description: Unsupported Media Type
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
+        '200': {$ref: '#/components/responses/200Empty'}
+        '401': {$ref: '#/components/responses/401'}
+        '415': {$ref: '#/components/responses/415'}
   /likes:
     parameters:
-      #- in: query
-      #  name: username
-      #  description: |-
-      #    the user owner for which we are asking the likes
-      #  required: true
-      #  schema:
-      #    type: string
-      #    pattern:  '^[a-zA-Z0-9_.-]*$'
-      #    minLength: 3
-      #    maxLength: 16
-      #    example: |-
-      #      theUser
-      - in: query
-        name: photoId
-        description: |-
-          the photo id for which we are asking the likes
-        required: false
-        schema:
-          type: string
-          pattern:  '^[a-zA-Z0-9_.-]*$'
-          minLength: 1
-          maxLength: 32
-          example: |-
-            10
-      - in: header
-        description: |-
-          session identifier
-        name: X-user-session-identifier
-        schema:
-          type: string
-          pattern:  '^[a-zA-Z0-9_.-]*$'
-          minLength: 3
-          maxLength: 180
-          example: |-
-            theUserInSession
+      - $ref: '#/components/parameters/X-user-session-identifier'
+      - $ref: '#/components/parameters/photoIdQueryParam'
     post:
       tags:
         - like
@@ -886,81 +385,15 @@ paths:
             schema:
               $ref: '#/components/schemas/Like'
       responses:
-        '201':
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Like'
-        '401':
-          description: Not Authorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '404':
-          description: Not found
-          # this error could happen if either the user or the photo have been canceled before invoking this api
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '415':
-          description: Unsupported Media Type
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
+        '201': {$ref: '#/components/responses/201Like'}
+        '401': {$ref: '#/components/responses/401'}
+        '404': {$ref: '#/components/responses/404'}
+        '415': {$ref: '#/components/responses/415'}
   /likes/{likeId}:
     parameters:
-      # - in: query
-      #   name: username
-      #   description: |-
-      #     the username of the user
-      #   required: true
-      #   schema:
-      #     type: string
-      #     pattern:  '^[a-zA-Z0-9_.-]*$'
-      #     minLength: 3
-      #     maxLength: 16
-      #     example: |-
-      #       theUser
-      - in: query
-        name: photoId
-        description: |-
-          the photo id
-        required: false
-        schema:
-          type: string
-          pattern:  '^[a-zA-Z0-9_.-]*$'
-          minLength: 1
-          maxLength: 32
-          example: |-
-            11
-      - in: path
-        name: likeId
-        description: |-
-          the like id
-        required: true
-        schema:
-          type: string
-          pattern:  '^[a-zA-Z0-9_.-]*$'
-          minLength: 1
-          maxLength: 32
-          example: |-
-            10
-      - in: header
-        name: X-user-session-identifier
-        description: |-
-          session identifier
-        required: true
-        schema:
-          type: string
-          pattern:  '^[a-zA-Z0-9_.-]*$'
-          minLength: 3
-          maxLength: 180
-          example: |-
-            theUserInSession
+      - $ref: '#/components/parameters/X-user-session-identifier'
+      - $ref: '#/components/parameters/photoIdQueryParam'
+      - $ref: '#/components/parameters/likeId'
     delete:
       tags:
         - like
@@ -974,61 +407,13 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EmptyReponse'
-        '401':
-          description: Not Authorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '415':
-          description: Unsupported Media Type
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
+        '200': {$ref: '#/components/responses/200Empty'}
+        '401': {$ref: '#/components/responses/401'}
+        '415': {$ref: '#/components/responses/415'}
   /comments:
     parameters:
-      # - in: query
-      #   name: username
-      #   description: the username of the user
-      #   required: true
-      #   schema:
-      #     type: string
-      #     pattern: '^[a-zA-Z0-9_.-]*$'
-      #     minLength: 3
-      #     maxLength: 16
-      #     example: |-
-      #       theUser
-      - in: query
-        name: photoId
-        description: |-
-          the photo id
-        required: false
-        schema:
-          type: string
-          pattern: '^[a-zA-Z0-9_.-]*$'
-          minLength: 1
-          maxLength: 32
-          example: |-
-            10
-      - in: header
-        name: X-user-session-identifier
-        description: |-
-          session identifier
-        required: true
-        schema:
-          type: string
-          pattern:  '^[a-zA-Z0-9_.-]*$'
-          minLength: 3
-          maxLength: 180
-          example: |-
-            theUserInSession
+      - $ref: '#/components/parameters/X-user-session-identifier'
+      - $ref: '#/components/parameters/photoIdQueryParam'
     post:
       tags:
         - comment
@@ -1049,79 +434,15 @@ paths:
             schema:
               $ref: '#/components/schemas/Comment'
       responses:
-        '201':
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Comment'
-        '401':
-          description: Not Authorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '404':
-          description: Not found
-          # this error could happen if either the user or the photo have been canceled before invoking this api
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '415':
-          description: Unsupported Media Type
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
+        '201': {$ref: '#/components/responses/201Comment'}
+        '401': {$ref: '#/components/responses/401'}
+        '404': {$ref: '#/components/responses/404'}
+        '415': {$ref: '#/components/responses/415'}
   /comments/{commentId}:
     parameters:
-      # - in: query
-      #   name: username
-      #   description: |-
-      #     the username of the user
-      #   required: true
-      #   schema:
-      #     type: string
-      #     pattern:  '^[a-zA-Z0-9_.-]*$'
-      #     minLength: 3
-      #     maxLength: 16
-      #     example: |-
-      #       theUser
-      - in: query
-        name: photoId
-        description: |-
-          the photo id
-        required: false
-        schema:
-          type: string
-          pattern:  '^[a-zA-Z0-9_.-]*$'
-          minLength: 1
-          maxLength: 32
-          example: |-
-            11
-      - in: path
-        name: commentId
-        description: the comment id
-        required: true
-        schema:
-          type: string
-          pattern:  '^[a-zA-Z0-9_.-]*$'
-          minLength: 1
-          maxLength: 32
-          example: |-
-            10
-      - in: header
-        name: X-user-session-identifier
-        schema:
-          description: |-
-            session identifier
-          type: string
-          pattern:  '^[a-zA-Z0-9_.-]*$'
-          minLength: 3
-          maxLength: 180
-          example:  |-
-            theUserInSession
+      - $ref: '#/components/parameters/X-user-session-identifier'
+      - $ref: '#/components/parameters/photoIdQueryParam'
+      - $ref: '#/components/parameters/commentId'
     delete:
       tags:
         - comment
@@ -1134,25 +455,133 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EmptyReponse'
-        '401':
-          description: Not Authorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '415':
-          description: Unsupported Media Type
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
+        '200': {$ref: '#/components/responses/200Empty'}
+        '401': {$ref: '#/components/responses/401'}
+        '415': {$ref: '#/components/responses/415'}
+
 components:
+  parameters:
+    usernamePathParam:
+      in: path
+      name: username
+      description: |-
+        the username of the user to retrieve
+      required: true
+      schema:
+        description: |-
+          the username of the user to retrieve
+        type: string
+        pattern:  '^[a-zA-Z0-9_.-]*$'
+        example:  |-
+          theUserName
+        minLength: 3
+        maxLength: 16
+    usernameQueryParam:
+      in: query
+      name: username
+      description: |-
+        the username of the user to retrieve
+      required: true
+      schema:
+        description: |-
+          the username of the user to retrieve
+        type: string
+        pattern:  '^[a-zA-Z0-9_.-]*$'
+        example:  |-
+          theUserName
+        minLength: 3
+        maxLength: 16
+    X-user-session-identifier:
+      in: header
+      name: X-user-session-identifier
+      description: |-
+        session identifier
+      schema:
+        description: |-
+          session identifier
+        type: string
+        pattern:  '^[a-zA-Z0-9_.-]*$'
+        minLength: 3
+        maxLength: 180
+        example:  |-
+          theUserName
+    photoIdPathParam:
+      in: path
+      name: photoId
+      description: |-
+        the photo id
+      required: true
+      schema:
+        type: string
+        pattern:  '^[a-zA-Z0-9_.-]*$'
+        minLength: 1
+        maxLength: 32
+        example: |-
+          10
+    photoIdQueryParam:
+      in: query
+      name: photoId
+      description: |-
+        the photo id
+      required: true
+      schema:
+        type: string
+        pattern:  '^[a-zA-Z0-9_.-]*$'
+        minLength: 1
+        maxLength: 32
+        example: |-
+          10
+    followId:
+      in: path
+      name: followId
+      description: |-
+        the follow id to be deleted
+      required: true
+      schema:
+        type: string
+        pattern:  '^[a-zA-Z0-9_.-]*$'
+        example: |-
+          10
+        minLength: 1
+        maxLength: 32
+    banId:
+      in: path
+      name: banId
+      description: |-
+        the ban id to be deleted
+      required: true
+      schema:
+        type: string
+        pattern:  '^[a-zA-Z0-9_.-]*$'
+        minLength: 1
+        maxLength: 32
+        example: |-
+          10
+    likeId:
+      in: path
+      name: likeId
+      description: |-
+        the like id
+      required: true
+      schema:
+        type: string
+        pattern:  '^[a-zA-Z0-9_.-]*$'
+        minLength: 1
+        maxLength: 32
+        example: |-
+          10
+    commentId:
+      in: path
+      name: commentId
+      description: the comment id
+      required: true
+      schema:
+        type: string
+        pattern:  '^[a-zA-Z0-9_.-]*$'
+        minLength: 1
+        maxLength: 32
+        example: |-
+          10
   schemas:
     User:
       description: it represents a user of the WASAPhoto Social Network
@@ -1421,6 +850,110 @@ components:
           maxLength: 16
           example: |-
             abcdef012345
+  responses:
+    '200Photo':
+      description: ok
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Photo'
+    '200UserHomePage':
+      description: ok
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UserHomePage'
+    '200Profile':
+      description: ok
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Profile'
+    '200Empty':
+      description: ok
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/EmptyReponse'
+    '200Photos':
+      description: ok
+      content:
+        application/json:
+          schema:
+            description:  |-
+              photos returned from the server
+            type: array
+            minItems: 0
+            maxItems: 999999
+            items:
+              $ref: '#/components/schemas/Photo'
+    '200Users':
+      description: ok
+      content:
+        application/json:
+          schema:
+            description:  |-
+              users returned from the server
+            type: array
+            minItems: 0
+            maxItems: 999999
+            items:
+              $ref: '#/components/schemas/User'
+    '201Ban':
+      description: ok
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Ban'
+    '201Photo':
+      description: Created
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Photo'
+    '201Follow':
+      description: Created
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Follow'
+    '201Like':
+      description: Created
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Like'
+    '201Comment':
+      description: Created
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Comment'
+    '401':
+      description: Not Authorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    '404':
+      description: Not found
+      # this error could happen if either the user or the photo have been canceled before invoking this api
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    '405':
+      description: Method Not Allowed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    '415':
+      description: Unsupported Media Type
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
   securitySchemes:
     bearerAuth:
       type: http
