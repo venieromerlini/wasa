@@ -1394,6 +1394,7 @@ components:
         id:
           description: the error code
           type: integer
+          format: int64
           enum:
             - 400
             - 401
