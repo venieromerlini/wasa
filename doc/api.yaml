@@ -512,6 +512,8 @@ components:
         the photo id
       required: true
       schema:
+        description: |-
+          photo id
         type: string
         pattern:  '^[a-zA-Z0-9_.-]*$'
         minLength: 1
@@ -525,6 +527,8 @@ components:
         the photo id
       required: true
       schema:
+        description: |-
+          photo id
         type: string
         pattern:  '^[a-zA-Z0-9_.-]*$'
         minLength: 1
@@ -538,6 +542,8 @@ components:
         the follow id to be deleted
       required: true
       schema:
+        description: |-
+          follow id
         type: string
         pattern:  '^[a-zA-Z0-9_.-]*$'
         example: |-
@@ -665,8 +671,8 @@ components:
             2017-07-21T17:32:28Z
           type: string
           format: date-time
-          minLength: 8
-          maxLength: 8
+          minLength: 20
+          maxLength: 20
       type: object
     Profile:
       description: it represents the profile data of user. It contains not public informations
