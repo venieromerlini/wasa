@@ -29,7 +29,6 @@ info:
     - getUserProfile
     - getMyStream
     
-    
     Some useful links:
     - [project spec ](http://gamificationlab.uniroma1.it/notes/Project.pdf)
   version: 0.0.1
@@ -172,7 +171,6 @@ paths:
         '415': {$ref: '#/components/responses/415'}
   /photos:
     parameters:
-      - $ref: '#/components/parameters/usernameQueryParam'
       - $ref: '#/components/parameters/X-user-session-identifier'
     get:
       tags:
@@ -212,6 +210,14 @@ paths:
                 photo to be uploaded
               type: object
               properties:
+                username:
+                  description: |-
+                    username uploading
+                  type: string
+                  pattern:  '^[a-zA-Z0-9_.-]*$'
+                  minLength: 3
+                  maxLength: 16
+                  format: binary
                 file:
                   description: |-
                     file to upload
