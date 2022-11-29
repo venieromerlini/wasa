@@ -743,6 +743,8 @@ components:
             $ref: '#/components/schemas/Follow'
       type: object
     Like:
+      description: |-
+        the like object
       x-swagger-router-model: it.uniroma1.wasa.venieromerlini.model.Like
       properties:
         id:
@@ -763,6 +765,8 @@ components:
           maximum: 999999
       type: object
     Comment:
+      description: |-
+        the comment object
       x-swagger-router-model: it.uniroma1.wasa.venieromerlini.model.Comment
       properties:
         id:
