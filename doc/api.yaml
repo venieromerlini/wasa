@@ -269,10 +269,21 @@ paths:
     parameters:
       - $ref: '#/components/parameters/usernameQueryParam'
       - $ref: '#/components/parameters/X-user-session-identifier'
+    get:
+      tags:
+        - follow
+      summary: find all follow relation
+      description: |-
+        recover all the follow relations available, it can be filtered by user
+      responses:
+        '200': {$ref: '#/components/responses/200Follows'}
+        '401': {$ref: '#/components/responses/401'}
+        '404': {$ref: '#/components/responses/404'}
+        '415': {$ref: '#/components/responses/415'}
     post:
       tags:
         - follow
-      summary: find all follow relations
+      summary: create a new follow relations
       description: |-
         Start following the activities of another user.
         If the API succeed, a newly create "Follow" object is responded to the client.
@@ -287,7 +298,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Follow'
+              $ref: '#/components/schemas/FollowRequest'
       responses:
         '201': {$ref: '#/components/responses/201Follow'}
         '401': {$ref: '#/components/responses/401'}
@@ -320,6 +331,17 @@ paths:
     parameters:
       - $ref: '#/components/parameters/usernameQueryParam'
       - $ref: '#/components/parameters/X-user-session-identifier'
+    get:
+      tags:
+        - ban
+      summary: find all ban relation
+      description: |-
+        recover all the ban relations available, it can be filtered by user
+      responses:
+        '200': {$ref: '#/components/responses/200Bans'}
+        '401': {$ref: '#/components/responses/401'}
+        '404': {$ref: '#/components/responses/404'}
+        '415': {$ref: '#/components/responses/415'}
     post:
       tags:
         - ban
@@ -339,7 +361,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Ban'
+              $ref: '#/components/schemas/BanRequest'
       responses:
         '201': {$ref: '#/components/responses/201Ban'}
         '401': {$ref: '#/components/responses/401'}
@@ -369,6 +391,17 @@ paths:
     parameters:
       - $ref: '#/components/parameters/X-user-session-identifier'
       - $ref: '#/components/parameters/photoIdQueryParam'
+    get:
+      tags:
+        - like
+      summary: find all likes relation
+      description: |-
+        recover all the like relations available, it can be filtered by photo
+      responses:
+        '200': {$ref: '#/components/responses/200Likes'}
+        '401': {$ref: '#/components/responses/401'}
+        '404': {$ref: '#/components/responses/404'}
+        '415': {$ref: '#/components/responses/415'}
     post:
       tags:
         - like
@@ -388,7 +421,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Like'
+              $ref: '#/components/schemas/LikeRequest'
       responses:
         '201': {$ref: '#/components/responses/201Like'}
         '401': {$ref: '#/components/responses/401'}
@@ -419,6 +452,17 @@ paths:
     parameters:
       - $ref: '#/components/parameters/X-user-session-identifier'
       - $ref: '#/components/parameters/photoIdQueryParam'
+    get:
+      tags:
+        - comment
+      summary: find all comment relation
+      description: |-
+        recover all the comments available, it can be filtered by photo
+      responses:
+        '200': {$ref: '#/components/responses/200Comments'}
+        '401': {$ref: '#/components/responses/401'}
+        '404': {$ref: '#/components/responses/404'}
+        '415': {$ref: '#/components/responses/415'}
     post:
       tags:
         - comment
@@ -437,7 +481,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Comment'
+              $ref: '#/components/schemas/CommentRequest'
       responses:
         '201': {$ref: '#/components/responses/201Comment'}
         '401': {$ref: '#/components/responses/401'}
@@ -764,6 +808,21 @@ components:
           minimum: 1
           maximum: 999999
       type: object
+    LikeRequest:
+      description: |-
+        the like request sent to put a like
+      x-swagger-router-model: it.uniroma1.wasa.venieromerlini.model.LikeRequest
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
+        photoId:
+          description: the photo id
+          type: integer
+          format: int64
+          example: 2345
+          minimum: 1
+          maximum: 999999
+      type: object
     Comment:
       description: |-
         the comment object
@@ -787,7 +846,30 @@ components:
         user:
           $ref: '#/components/schemas/User'
         photoId:
-          description: the photo id
+          description: photo id
+          type: integer
+          format: int64
+          example: 2345
+          minimum: 1
+          maximum: 999999
+      type: object
+    CommentRequest:
+      description: |-
+        the comment object
+      x-swagger-router-model: it.uniroma1.wasa.venieromerlini.model.CommentRequest
+      properties:
+        text:
+          description: the comment itself
+          type: string
+          pattern: '^[a-zA-Z0-9_.?!,. -]*$'
+          minLength: 1
+          maxLength: 999
+          example: |-
+            U R GORGEOUS!
+        user:
+          $ref: '#/components/schemas/User'
+        photoId:
+          description: photo id
           type: integer
           format: int64
           example: 2345
@@ -796,6 +878,22 @@ components:
       type: object
     Ban:
       x-swagger-router-model: it.uniroma1.wasa.venieromerlini.model.Ban
+      description: it represents a Ban, a user banning another user
+      properties:
+        id:
+          description: the ban id
+          type: integer
+          format: int64
+          example: 1234
+          minimum: 1
+          maximum: 999999
+        user:
+          $ref: '#/components/schemas/User'
+        banned:
+          $ref: '#/components/schemas/Banned'
+      type: object
+    BanRequest:
+      x-swagger-router-model: it.uniroma1.wasa.venieromerlini.model.BanRequest
       description: it represents a Ban, a user banning another user
       properties:
         id:
@@ -821,6 +919,15 @@ components:
           example: 1234
           minimum: 1
           maximum: 999999
+        user:
+          $ref: '#/components/schemas/User'
+        followee:
+          $ref: '#/components/schemas/Followee'
+      type: object
+    FollowRequest:
+      description: it represents a Follow, a user following another user
+      x-swagger-router-model: it.uniroma1.wasa.venieromerlini.model.FollowRequest
+      properties:
         user:
           $ref: '#/components/schemas/User'
         followee:
@@ -902,6 +1009,54 @@ components:
             maxItems: 999999
             items:
               $ref: '#/components/schemas/Photo'
+    '200Bans':
+      description: ok
+      content:
+        application/json:
+          schema:
+            description:  |-
+              Bans returned from the server
+            type: array
+            minItems: 0
+            maxItems: 999999
+            items:
+              $ref: '#/components/schemas/Ban'
+    '200Likes':
+      description: ok
+      content:
+        application/json:
+          schema:
+            description:  |-
+              Likes returned from the server
+            type: array
+            minItems: 0
+            maxItems: 999999
+            items:
+              $ref: '#/components/schemas/Like'
+    '200Follows':
+      description: ok
+      content:
+        application/json:
+          schema:
+            description:  |-
+              follows relation returned from the server
+            type: array
+            minItems: 0
+            maxItems: 999999
+            items:
+              $ref: '#/components/schemas/Follow'
+    '200Comments':
+      description: ok
+      content:
+        application/json:
+          schema:
+            description:  |-
+              Comments relation returned from the server
+            type: array
+            minItems: 0
+            maxItems: 999999
+            items:
+              $ref: '#/components/schemas/Comment'
     '200Users':
       description: ok
       content:
