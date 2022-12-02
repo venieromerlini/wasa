@@ -48,7 +48,7 @@ tags:
   - name: comment
     description: put or remove a comment
   - name: like
-    description: like/unlike photo Opration
+    description: like/unlike photo operations
 
 paths:
   /session:
@@ -530,7 +530,7 @@ components:
       name: username
       description: |-
         the username of the user to retrieve
-      required: true
+      required: false
       schema:
         description: |-
           the username of the user to retrieve
@@ -574,7 +574,7 @@ components:
       name: photoId
       description: |-
         the photo id
-      required: true
+      required: false
       schema:
         description: |-
           photo id
