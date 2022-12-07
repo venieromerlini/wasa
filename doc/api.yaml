@@ -275,6 +275,7 @@ paths:
       summary: find all follow relation
       description: |-
         recover all the follow relations available, it can be filtered by user
+      operationId: findAllFollows
       responses:
         '200': {$ref: '#/components/responses/200Follows'}
         '401': {$ref: '#/components/responses/401'}
@@ -337,6 +338,7 @@ paths:
       summary: find all ban relation
       description: |-
         recover all the ban relations available, it can be filtered by user
+      operationId: findAllBans
       responses:
         '200': {$ref: '#/components/responses/200Bans'}
         '401': {$ref: '#/components/responses/401'}
@@ -397,6 +399,7 @@ paths:
       summary: find all likes relation
       description: |-
         recover all the like relations available, it can be filtered by photo
+      operationId: findAllLikes
       responses:
         '200': {$ref: '#/components/responses/200Likes'}
         '401': {$ref: '#/components/responses/401'}
@@ -458,6 +461,7 @@ paths:
       summary: find all comment relation
       description: |-
         recover all the comments available, it can be filtered by photo
+      operationId: findAllComments
       responses:
         '200': {$ref: '#/components/responses/200Comments'}
         '401': {$ref: '#/components/responses/401'}
