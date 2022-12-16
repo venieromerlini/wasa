@@ -37,10 +37,10 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.POST("/likes", rt.likePhoto)
 	rt.router.DELETE("/likes/:likeId", rt.unlikePhoto)
 
-	rt.router.DELETE("/photos/:photoId", rt.deletePhoto)
-	rt.router.GET("/photos/:photos", rt.findUserPhoto)
 	rt.router.GET("/photos", rt.findUserPhotos)
 	rt.router.POST("/photos", rt.uploadPhoto)
+	rt.router.GET("/photos/:photoId", rt.findUserPhoto)
+	rt.router.DELETE("/photos/:photoId", rt.deletePhoto)
 
 	return rt.router
 }

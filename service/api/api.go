@@ -49,6 +49,7 @@ type Config struct {
 	// Logger where log entries are sent
 	Logger logrus.FieldLogger
 
+	MemDatabase database.AppDatabaseMemory
 	// Database is the instance of database.AppDatabase where data are saved
 	Database database.AppDatabase
 }
@@ -68,7 +69,7 @@ func New(cfg Config) (Router, error) {
 	if cfg.Logger == nil {
 		return nil, errors.New("logger is required")
 	}
-	if cfg.Database == nil {
+	if cfg.Database == nil && cfg.MemDatabase == nil {
 		return nil, errors.New("database is required")
 	}
 
@@ -82,6 +83,7 @@ func New(cfg Config) (Router, error) {
 		router:     router,
 		baseLogger: cfg.Logger,
 		db:         cfg.Database,
+		memdb:      cfg.MemDatabase,
 	}, nil
 }
 
@@ -92,5 +94,6 @@ type _router struct {
 	// Use context logger if available (e.g., in requests) instead of this logger.
 	baseLogger logrus.FieldLogger
 
-	db database.AppDatabase
+	db    database.AppDatabase
+	memdb database.AppDatabaseMemory
 }
