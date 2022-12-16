@@ -98,6 +98,11 @@ func run() error {
 		return fmt.Errorf("creating AppDatabase: %w", err)
 	}
 
+	memdb, errm := database.NewMem()
+	if errm != nil {
+		logger.WithError(err).Error("error creating MemoryAppDatabase")
+		return fmt.Errorf("creating MemoryAppDatabase: %w", errm)
+	}
 	// Start (main) API server
 	logger.Info("initializing API server")
 
@@ -112,8 +117,9 @@ func run() error {
 
 	// Create the API router
 	apirouter, err := api.New(api.Config{
-		Logger:   logger,
-		Database: db,
+		Logger:      logger,
+		Database:    db,
+		MemDatabase: memdb,
 	})
 	if err != nil {
 		logger.WithError(err).Error("error creating the API server instance")

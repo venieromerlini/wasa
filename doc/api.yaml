@@ -171,6 +171,7 @@ paths:
         '415': {$ref: '#/components/responses/415'}
   /photos:
     parameters:
+      - $ref: '#/components/parameters/usernameQueryParam'
       - $ref: '#/components/parameters/X-user-session-identifier'
     get:
       tags:
