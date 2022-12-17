@@ -2,6 +2,7 @@ package database
 
 import (
 	"errors"
+	"sort"
 	"strconv"
 	"time"
 	"wasa/service/model"
@@ -32,7 +33,10 @@ type AppDatabaseMemory interface {
 	DeletePhoto(requestorUser string, id int64)
 	FindAllPhotos(username string) []model.Photo
 	FindPhoto(photoId int64) (model.Photo, error)
+
 	UpdateUsername(requestorUser string, oldUsername string, newUsername string) model.User
+	FindUserHomePageByUsername(username string) model.UserHomePage
+	FindUserProfileByUsername(username string) model.Profile
 }
 
 type appdbmemimpl struct {
@@ -46,6 +50,16 @@ type appdbmemimpl struct {
 	sequence    map[int64]int64
 }
 
+func (m appdbmemimpl) FindUserProfileByUsername(username string) model.Profile {
+	profile := new(model.Profile)
+	user := m.findUserByUsername(username)
+	profile.User = &user
+	profile.Photos = m.FindAllPhotos(username)
+	profile.Followees = m.FindAllFollow(username)
+	profile.Followers = m.findAllFollowers(username)
+	return *profile
+}
+
 func (m appdbmemimpl) UpdateUsername(_ string, oldUsername string, newUsername string) model.User {
 	user := new(model.User)
 	user.Id = m.userIdsMap[oldUsername]
@@ -53,6 +67,39 @@ func (m appdbmemimpl) UpdateUsername(_ string, oldUsername string, newUsername s
 	m.usersMap[user.Id] = *user
 	m.userIdsMap[newUsername] = user.Id
 	delete(m.userIdsMap, oldUsername)
+	return *user
+}
+
+/*
+UserStream // Each user will be presented with a stream of photos (images) in reverse chronological order,
+with information about when each photo was uploaded (date and time  and how many likes and comments it has.
+The stream is composed by photos from “following” (other users that the user follows).
+*/
+func (m appdbmemimpl) FindUserHomePageByUsername(username string) model.UserHomePage {
+	follows := m.FindAllFollow(username)
+	var photos []model.Photo
+	for _, follow := range follows {
+		photos = append(photos, m.FindAllPhotos(follow.Followee.Username)...)
+	}
+	//CONTROLLARE I BAN: evitare che le foto di quelli che ti bannano vanno a finire nell'insieme finale
+
+	sort.Slice(photos, func(i, j int) bool {
+		return photos[i].UploadDate.Before(photos[j].UploadDate)
+	})
+	homepage := new(model.UserHomePage)
+
+	homepage.Id = 0
+	user := m.findUserByUsername(username)
+	homepage.User = &user
+	homepage.Followees = follows
+	homepage.Photos = photos
+	return *homepage
+}
+
+func (m appdbmemimpl) findUserByUsername(username string) model.User {
+	user := new(model.User)
+	user.Id = m.userIdsMap[username]
+	user.Username = username
 	return *user
 }
 
@@ -240,6 +287,23 @@ func (m appdbmemimpl) FindAllFollow(username string) []model.Follow {
 	} else {
 		for _, follow := range m.followsMap {
 			follows = append(follows, follow)
+		}
+	}
+	if len(follows) == 0 {
+		follows = make([]model.Follow, 0)
+	}
+	return follows
+}
+
+func (m appdbmemimpl) findAllFollowers(username string) []model.Follow {
+	var follows []model.Follow
+	if username != "" {
+		for _, follow := range m.followsMap {
+			if follow.Followee.Id == m.userIdsMap[username] {
+				follow.User.Username = m.usersMap[follow.User.Id].Username
+				follow.Followee.Username = m.usersMap[follow.Followee.Id].Username
+				follows = append(follows, follow)
+			}
 		}
 	}
 	if len(follows) == 0 {

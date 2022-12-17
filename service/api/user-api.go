@@ -26,10 +26,41 @@ func (rt *_router) findAllUser(w http.ResponseWriter, r *http.Request, ps httpro
 }
 
 func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	log := rt.baseLogger
+	log.Info("invoked ", r.URL.Path)
+	username := ps.ByName("username")
+	homepage := rt.memdb.FindUserHomePageByUsername(username)
+	body, err1 := json.Marshal(homepage)
+	if err1 != nil {
+		log.Error("error: ", err1)
+		http.Error(w, err1.Error(), http.StatusInternalServerError)
+		return
+	}
+	_, err2 := w.Write(body)
+	if err2 != nil {
+		log.Error("error: ", err2)
+		http.Error(w, err2.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-
+	log := rt.baseLogger
+	log.Info("invoked ", r.URL.Path)
+	username := ps.ByName("username")
+	userProfile := rt.memdb.FindUserProfileByUsername(username)
+	body, err1 := json.Marshal(userProfile)
+	if err1 != nil {
+		log.Error("error: ", err1)
+		http.Error(w, err1.Error(), http.StatusInternalServerError)
+		return
+	}
+	_, err2 := w.Write(body)
+	if err2 != nil {
+		log.Error("error: ", err2)
+		http.Error(w, err2.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {

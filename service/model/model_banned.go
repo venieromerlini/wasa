@@ -14,5 +14,5 @@ type Banned struct {
 	// the username of the user, it is unique
 	Username string `json:"username,omitempty"`
 	// the user id
-	Id int64 `json:"id,omitempty"`
+	Id int64 `json:"-"`
 }
