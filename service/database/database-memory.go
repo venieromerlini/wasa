@@ -75,13 +75,45 @@ UserStream // Each user will be presented with a stream of photos (images) in re
 with information about when each photo was uploaded (date and time  and how many likes and comments it has.
 The stream is composed by photos from “following” (other users that the user follows).
 */
+func (m appdbmemimpl) subtract(from []string, what []string) []string {
+	var final []string
+	found := false
+	elem := ""
+	for _, f := range from {
+		elem = f
+		for _, w := range what {
+			if f == w {
+				found = true
+				break
+			}
+		}
+		if !found {
+			final = append(final, elem)
+		}
+		found = false
+
+	}
+	return final
+}
+
 func (m appdbmemimpl) FindUserHomePageByUsername(username string) model.UserHomePage {
 	follows := m.FindAllFollow(username)
-	var photos []model.Photo
+	bans := m.findAllBanners(username)
+
+	var followUsernames []string
 	for _, follow := range follows {
-		photos = append(photos, m.FindAllPhotos(follow.Followee.Username)...)
+		followUsernames = append(followUsernames, follow.Followee.Username)
 	}
-	//CONTROLLARE I BAN: evitare che le foto di quelli che ti bannano vanno a finire nell'insieme finale
+
+	var bansUsernames []string
+	for _, ban := range bans {
+		bansUsernames = append(bansUsernames, ban.User.Username)
+	}
+
+	var photos []model.Photo
+	for _, usernames := range m.subtract(followUsernames, bansUsernames) {
+		photos = append(photos, m.FindAllPhotos(usernames)...)
+	}
 
 	sort.Slice(photos, func(i, j int) bool {
 		return photos[i].UploadDate.Before(photos[j].UploadDate)
@@ -351,6 +383,23 @@ func (m appdbmemimpl) FindAllBans(username string) []model.Ban {
 	if username != "" {
 		for _, ban := range m.bansMap {
 			if ban.User.Id == m.userIdsMap[username] {
+				ban.User.Username = m.usersMap[ban.User.Id].Username
+				ban.Banned.Username = m.usersMap[ban.Banned.Id].Username
+				bans = append(bans, ban)
+			}
+		}
+	}
+	if len(bans) == 0 {
+		bans = make([]model.Ban, 0)
+	}
+	return bans
+}
+
+func (m appdbmemimpl) findAllBanners(username string) []model.Ban {
+	var bans []model.Ban
+	if username != "" {
+		for _, ban := range m.bansMap {
+			if ban.Banned.Id == m.userIdsMap[username] {
 				ban.User.Username = m.usersMap[ban.User.Id].Username
 				ban.Banned.Username = m.usersMap[ban.Banned.Id].Username
 				bans = append(bans, ban)
