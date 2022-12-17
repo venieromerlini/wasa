@@ -1,8 +1,8 @@
 package database
 
 import (
-	b64 "encoding/base64"
 	"errors"
+	"strconv"
 	"time"
 	"wasa/service/model"
 )
@@ -32,10 +32,12 @@ type AppDatabaseMemory interface {
 	DeletePhoto(requestorUser string, id int64)
 	FindAllPhotos(username string) []model.Photo
 	FindPhoto(photoId int64) (model.Photo, error)
+	UpdateUsername(requestorUser string, oldUsername string, newUsername string) model.User
 }
 
 type appdbmemimpl struct {
-	usersMap    map[string]model.User
+	usersMap    map[int64]model.User
+	userIdsMap  map[string]int64
 	bansMap     map[int64]model.Ban
 	followsMap  map[int64]model.Follow
 	commentsMap map[int64]model.Comment
@@ -44,9 +46,20 @@ type appdbmemimpl struct {
 	sequence    map[int64]int64
 }
 
+func (m appdbmemimpl) UpdateUsername(_ string, oldUsername string, newUsername string) model.User {
+	user := new(model.User)
+	user.Id = m.userIdsMap[oldUsername]
+	user.Username = newUsername
+	m.usersMap[user.Id] = *user
+	m.userIdsMap[newUsername] = user.Id
+	delete(m.userIdsMap, oldUsername)
+	return *user
+}
+
 func (m appdbmemimpl) FindPhoto(photoId int64) (model.Photo, error) {
 	photo, ok := m.photosMaps[photoId]
 	if ok {
+		photo.User.Username = m.usersMap[photo.User.Id].Username
 		photo.Likes = m.FindAllLikes(photo.Id)
 		photo.Comments = m.FindAllComments(photo.Id)
 	} else {
@@ -57,18 +70,18 @@ func (m appdbmemimpl) FindPhoto(photoId int64) (model.Photo, error) {
 
 func (m appdbmemimpl) FindAllPhotos(username string) []model.Photo {
 	var photos []model.Photo
+
 	if username != "" {
 		for _, photo := range m.photosMaps {
-			if photo.User.Username == username {
+			if photo.User.Id == m.userIdsMap[username] {
+				photo.User.Username = m.usersMap[photo.User.Id].Username
 				photo.Likes = m.FindAllLikes(photo.Id)
 				photo.Comments = m.FindAllComments(photo.Id)
 				photos = append(photos, photo)
 			}
 		}
 	} else {
-		for _, photo := range m.photosMaps {
-			photos = append(photos, photo)
-		}
+		panic("username is mandatory")
 	}
 	if len(photos) == 0 {
 		photos = make([]model.Photo, 0)
@@ -94,12 +107,14 @@ func (m appdbmemimpl) DeletePhoto(requestorUser string, id int64) {
 
 func (m appdbmemimpl) SavePhoto(username string, bytes []byte) model.Photo {
 	photo := new(model.Photo)
-	user := m.usersMap[username]
+	user := m.usersMap[m.userIdsMap[username]]
 	photo.User = new(model.User)
 	photo.User.Username = user.Username
-	photo.Data = b64.StdEncoding.EncodeToString(bytes)
+	photo.User.Id = user.Id
+	photo.Data = bytes
 	photo.UploadDate = time.Now()
 	photo.Id = m.incrementAndGet()
+	photo.Link = "/photos/" + strconv.Itoa(int(photo.Id))
 	m.photosMaps[photo.Id] = *photo
 	return *photo
 }
@@ -109,12 +124,9 @@ func (m appdbmemimpl) FindAllLikes(photoId int64) []model.Like {
 	if photoId > 0 {
 		for _, like := range m.likesMap {
 			if like.PhotoId == photoId {
+				like.User.Username = m.usersMap[like.User.Id].Username
 				likes = append(likes, like)
 			}
-		}
-	} else {
-		for _, like := range m.likesMap {
-			likes = append(likes, like)
 		}
 	}
 	if len(likes) == 0 {
@@ -173,12 +185,9 @@ func (m appdbmemimpl) FindAllComments(photoId int64) []model.Comment {
 	if photoId > 0 {
 		for _, comment := range m.commentsMap {
 			if comment.PhotoId == photoId {
+				comment.User.Username = m.usersMap[comment.User.Id].Username
 				comments = append(comments, comment)
 			}
-		}
-	} else {
-		for _, comment := range m.commentsMap {
-			comments = append(comments, comment)
 		}
 	}
 	if len(comments) == 0 {
@@ -211,7 +220,9 @@ func (m appdbmemimpl) SaveFollow(followRequest model.FollowRequest) model.Follow
 	}
 	follow.Id = m.incrementAndGet()
 	follow.User = followRequest.User
+	follow.User.Id = m.userIdsMap[followRequest.User.Username]
 	follow.Followee = followRequest.Followee
+	follow.Followee.Id = m.userIdsMap[followRequest.Followee.Username]
 	m.followsMap[follow.Id] = follow
 	return follow
 }
@@ -220,7 +231,9 @@ func (m appdbmemimpl) FindAllFollow(username string) []model.Follow {
 	var follows []model.Follow
 	if username != "" {
 		for _, follow := range m.followsMap {
-			if follow.User.Username == username {
+			if follow.User.Id == m.userIdsMap[username] {
+				follow.User.Username = m.usersMap[follow.User.Id].Username
+				follow.Followee.Username = m.usersMap[follow.Followee.Id].Username
 				follows = append(follows, follow)
 			}
 		}
@@ -273,13 +286,11 @@ func (m appdbmemimpl) FindAllBans(username string) []model.Ban {
 	var bans []model.Ban
 	if username != "" {
 		for _, ban := range m.bansMap {
-			if ban.User.Username == username {
+			if ban.User.Id == m.userIdsMap[username] {
+				ban.User.Username = m.usersMap[ban.User.Id].Username
+				ban.Banned.Username = m.usersMap[ban.Banned.Id].Username
 				bans = append(bans, ban)
 			}
-		}
-	} else {
-		for _, ban := range m.bansMap {
-			bans = append(bans, ban)
 		}
 	}
 	if len(bans) == 0 {
@@ -297,17 +308,26 @@ func (m appdbmemimpl) FindAllUsers() []model.User {
 }
 
 func (m appdbmemimpl) SaveUser(username string) model.User {
-	user := new(model.User)
-	user.Username = username
-	m.usersMap[user.Username] = *user
-	return *user
+	e, ok := m.userIdsMap[username]
+	if ok {
+		return m.usersMap[e]
+	} else {
+		user := new(model.User)
+		user.Id = m.incrementAndGet()
+		user.Username = username
+		m.usersMap[user.Id] = *user
+		m.userIdsMap[username] = user.Id
+		return *user
+	}
+
 	//panic("implement me")
 }
 
 func NewMem() (AppDatabaseMemory, error) {
 
 	return &appdbmemimpl{
-		usersMap:   make(map[string]model.User),
+		usersMap:   make(map[int64]model.User),
+		userIdsMap: make(map[string]int64),
 		bansMap:    make(map[int64]model.Ban),
 		followsMap: make(map[int64]model.Follow),
 		likesMap:   make(map[int64]model.Like),

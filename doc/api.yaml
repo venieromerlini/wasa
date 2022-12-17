@@ -246,7 +246,7 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200': {$ref: '#/components/responses/200Photo'}
+        '200': {$ref: '#/components/responses/200PhotoData'}
         '401': {$ref: '#/components/responses/401'}
         '404': {$ref: '#/components/responses/404'}
         '415': {$ref: '#/components/responses/415'}
@@ -712,11 +712,11 @@ components:
           maxItems: 999999
           items:
             $ref: '#/components/schemas/Comment'
-        data:
-          description: base64 data photo
-          pattern:  '^[a-zA-Z0-9_.-]*$'
+        link:
+          description: link of photo
+          pattern:  '^[a-zA-Z0-9_\/.-]*$'
           example: |-
-            iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAB
+            /photos/1
           type: string
         uploadDate:
           description: the upload date for this photo
@@ -978,6 +978,15 @@ components:
           example: |-
             abcdef012345
   responses:
+    '200PhotoData':
+      description: ok
+      content:
+        image/png:
+          schema:
+            description: |-
+              binary image of the photo
+            type: string
+            format: binary
     '200Photo':
       description: ok
       content:

@@ -36,14 +36,9 @@ func (rt *_router) findUserPhoto(w http.ResponseWriter, r *http.Request, ps http
 		http.Error(w, "", http.StatusNotFound)
 		return
 	}
-	body, err1 := json.Marshal(photo)
-	if err1 != nil {
-		log.Error("error: ", err1)
-		http.Error(w, err1.Error(), http.StatusInternalServerError)
-		return
-	}
-	w.Header().Set("content-type", "application/json")
-	_, err2 := w.Write(body)
+
+	w.Header().Set("content-type", "image/png")
+	_, err2 := w.Write(photo.Data)
 	if err2 != nil {
 		log.Error("error: ", err2)
 		http.Error(w, err2.Error(), http.StatusInternalServerError)
@@ -53,6 +48,7 @@ func (rt *_router) findUserPhoto(w http.ResponseWriter, r *http.Request, ps http
 
 func (rt *_router) findUserPhotos(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	log := rt.baseLogger
+	log.Info("invoked ", r.URL.Path)
 	//requestorUser := r.Header.Get("X-User-Session-Identifier")
 	username := r.URL.Query().Get("username")
 
@@ -75,6 +71,7 @@ func (rt *_router) findUserPhotos(w http.ResponseWriter, r *http.Request, ps htt
 
 func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	log := rt.baseLogger
+	log.Info("invoked ", r.URL.Path)
 	err0 := r.ParseMultipartForm(32 << 20) // maxMemory 32MB
 	if err0 != nil {
 		log.Error("error: ", err0)
