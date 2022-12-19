@@ -21,14 +21,14 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 	body, err1 := json.Marshal(ban)
 	if err1 != nil {
 		log.Error("error: ", err1)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err1.Error(), http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("content-type", "application/json")
 	_, err2 := w.Write(body)
 	if err2 != nil {
 		log.Error("error: ", err2)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err2.Error(), http.StatusInternalServerError)
 		return
 	}
 }
@@ -62,5 +62,4 @@ func (rt *_router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprout
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 	rt.memdb.DeleteBan(username, inInt64)
-
 }

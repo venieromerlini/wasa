@@ -10,7 +10,7 @@ import (
 
 func (rt *_router) findAllFollows(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	log := rt.baseLogger
-	//username := r.Header.Get("X-User-Session-Identifier")
+	// username := r.Header.Get("X-User-Session-Identifier")
 	username := r.URL.Query().Get("username")
 	follows := rt.memdb.FindAllFollow(username)
 	body, err := json.Marshal(follows)
@@ -41,14 +41,14 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 	body, err1 := json.Marshal(follow)
 	if err1 != nil {
 		log.Error("error: ", err1)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err1.Error(), http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("content-type", "application/json")
 	_, err2 := w.Write(body)
 	if err2 != nil {
 		log.Error("error: ", err2)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err2.Error(), http.StatusInternalServerError)
 		return
 	}
 

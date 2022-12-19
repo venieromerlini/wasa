@@ -16,5 +16,5 @@ type Ban struct {
 
 	User *User `json:"user,omitempty"`
 
-	Banned *Banned `json:"banned,omitempty"`
+	Banned *User `json:"banned,omitempty"`
 }

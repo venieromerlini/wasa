@@ -16,5 +16,5 @@ type Follow struct {
 
 	User *User `json:"user,omitempty"`
 
-	Followee *Followee `json:"followee,omitempty"`
+	Followee *User `json:"followee,omitempty"`
 }

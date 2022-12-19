@@ -11,7 +11,6 @@ package model
 
 // it represents a Follow, a user following another user
 type FollowRequest struct {
-	User *User `json:"user,omitempty"`
-
-	Followee *Followee `json:"followee,omitempty"`
+	User     *User `json:"user,omitempty"`
+	Followee *User `json:"followee,omitempty"`
 }

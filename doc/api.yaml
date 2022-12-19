@@ -987,12 +987,6 @@ components:
               binary image of the photo
             type: string
             format: binary
-    '200Photo':
-      description: ok
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Photo'
     '200UserHomePage':
       description: ok
       content:

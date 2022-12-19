@@ -26,6 +26,7 @@ package main
 import (
 	"context"
 	"database/sql"
+	b64 "encoding/base64"
 	"errors"
 	"fmt"
 	"github.com/ardanlabs/conf"
@@ -39,6 +40,7 @@ import (
 	"wasa/service/api"
 	"wasa/service/database"
 	"wasa/service/globaltime"
+	"wasa/service/model"
 )
 
 // main is the program entry point. The only purpose of this function is to call run() and set the exit code if there is
@@ -107,7 +109,6 @@ func run() error {
 	}
 	// Start (main) API server
 	logger.Info("initializing API server")
-
 	// Make a channel to listen for an interrupt or terminate signal from the OS.
 	// Use a buffered channel because the signal package requires it.
 	shutdown := make(chan os.Signal, 1)
@@ -123,6 +124,9 @@ func run() error {
 		Database:    db,
 		MemDatabase: memdb,
 	})
+
+	populateMockData(memdb, logger)
+
 	if err != nil {
 		logger.WithError(err).Error("error creating the API server instance")
 		return fmt.Errorf("creating the API server instance: %w", err)
@@ -182,7 +186,7 @@ func run() error {
 
 		// Log the status of this shutdown.
 		switch {
-		case sig == syscall.SIGTERM: //SIGSTOP
+		case sig == syscall.SIGTERM: // SIGSTOP
 			return errors.New("integrity issue caused shutdown")
 		case err != nil:
 			return fmt.Errorf("could not stop server gracefully: %w", err)
@@ -190,4 +194,81 @@ func run() error {
 	}
 
 	return nil
+}
+
+func populateMockData(memdb database.AppDatabaseMemory, logger *logrus.Logger) {
+
+	// MOCK DATA
+
+	photo1b64 := "Qk2KAAAAAAAAADYAAAAoAAAABAAAAAcAAAABABgAAAAAAFQAAAAAAAAAAAAAAAAAAAAAAAAA6KIA////////////////////////////////////////////TLEi////////////////////////////////////////////JBzt////////////"
+	photo1Dec, erroremock := b64.StdEncoding.DecodeString(photo1b64)
+	if erroremock != nil {
+		logger.Error("error: ", erroremock)
+	}
+	photo2b64 := "iVBORw0KGgoAAAANSUhEUgAAAAsAAAALCAYAAACprHcmAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAABVSURBVChTtZHBCgAgCEOn///P1STDRkGX3iETdU2yNkDBzOYNkBJ8xicos8appMo135RZyKe1kbj6uhHD43heMJpPPjMmzF193WDftmBVS/XKr08BOpMPOwHM/fW8AAAAAElFTkSuQmCC"
+	photo2Dec, erroremock2 := b64.StdEncoding.DecodeString(photo2b64)
+	if erroremock2 != nil {
+		logger.Error("error: ", erroremock2)
+	}
+
+	veniero := new(model.User)
+	veniero.Username = "veniero"
+
+	pippo := new(model.User)
+	pippo.Username = "pippo"
+
+	topolino := new(model.User)
+	topolino.Username = "topolino"
+
+	memdb.SaveUser(veniero.Username)
+	memdb.SaveUser(pippo.Username)
+	memdb.SaveUser(topolino.Username)
+
+	photo1 := memdb.SavePhoto(veniero.Username, photo1Dec)
+	memdb.SavePhoto(pippo.Username, photo2Dec)
+	memdb.SavePhoto(topolino.Username, photo2Dec)
+
+	memdb.SaveFollow(model.FollowRequest{
+		User:     veniero,
+		Followee: pippo,
+	})
+
+	memdb.SaveFollow(model.FollowRequest{
+		User:     veniero,
+		Followee: topolino,
+	})
+
+	memdb.SaveFollow(model.FollowRequest{
+		User:     pippo,
+		Followee: veniero,
+	})
+
+	memdb.SaveBan(model.BanRequest{
+		User:   topolino,
+		Banned: veniero,
+	})
+
+	memdb.SaveComment(model.CommentRequest{
+		User:    veniero,
+		PhotoId: photo1.Id,
+		Text:    "Beautiful!",
+	})
+
+	memdb.SaveComment(model.CommentRequest{
+		User:    pippo,
+		PhotoId: photo1.Id,
+		Text:    "Beautiful!",
+	})
+
+	memdb.SaveLike(model.LikeRequest{
+		User:    veniero,
+		PhotoId: photo1.Id,
+	})
+
+	memdb.SaveLike(model.LikeRequest{
+		User:    veniero,
+		PhotoId: photo1.Id,
+	})
+	memdb.UpdateUsername("_", veniero.Username, "veniero2")
+
 }

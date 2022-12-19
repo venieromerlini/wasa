@@ -78,9 +78,8 @@ The stream is composed by photos from “following” (other users that the user
 func (m appdbmemimpl) subtract(from []string, what []string) []string {
 	var final []string
 	found := false
-	elem := ""
 	for _, f := range from {
-		elem = f
+		elem := f
 		for _, w := range what {
 			if f == w {
 				found = true
@@ -119,7 +118,6 @@ func (m appdbmemimpl) FindUserHomePageByUsername(username string) model.UserHome
 		return photos[i].UploadDate.Before(photos[j].UploadDate)
 	})
 	homepage := new(model.UserHomePage)
-
 	homepage.Id = 0
 	user := m.findUserByUsername(username)
 	homepage.User = &user
@@ -366,7 +364,6 @@ func (m appdbmemimpl) SaveBan(banRequest model.BanRequest) model.Ban {
 	ban.Banned = banRequest.Banned
 	m.bansMap[ban.Id] = ban
 	return ban
-
 }
 
 func (m appdbmemimpl) existsBan(banRequest model.BanRequest) (bool, model.Ban) {
@@ -432,19 +429,18 @@ func (m appdbmemimpl) SaveUser(username string) model.User {
 		m.userIdsMap[username] = user.Id
 		return *user
 	}
-
-	//panic("implement me")
 }
 
 func NewMem() (AppDatabaseMemory, error) {
 
 	return &appdbmemimpl{
-		usersMap:   make(map[int64]model.User),
-		userIdsMap: make(map[string]int64),
-		bansMap:    make(map[int64]model.Ban),
-		followsMap: make(map[int64]model.Follow),
-		likesMap:   make(map[int64]model.Like),
-		photosMaps: make(map[int64]model.Photo),
-		sequence:   map[int64]int64{0: 1},
+		usersMap:    make(map[int64]model.User),
+		userIdsMap:  make(map[string]int64),
+		bansMap:     make(map[int64]model.Ban),
+		followsMap:  make(map[int64]model.Follow),
+		likesMap:    make(map[int64]model.Like),
+		photosMaps:  make(map[int64]model.Photo),
+		commentsMap: make(map[int64]model.Comment),
+		sequence:    map[int64]int64{0: 1},
 	}, nil
 }

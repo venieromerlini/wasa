@@ -19,7 +19,6 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 	rt.memdb.DeletePhoto(username, inInt64)
-
 }
 
 func (rt *_router) findUserPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -49,7 +48,7 @@ func (rt *_router) findUserPhoto(w http.ResponseWriter, r *http.Request, ps http
 func (rt *_router) findUserPhotos(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	log := rt.baseLogger
 	log.Info("invoked ", r.URL.Path)
-	//requestorUser := r.Header.Get("X-User-Session-Identifier")
+	// requestorUser := r.Header.Get("X-User-Session-Identifier")
 	username := r.URL.Query().Get("username")
 
 	photos := rt.memdb.FindAllPhotos(username)
@@ -81,62 +80,46 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	_, h, err1 := r.FormFile("file")
 	filerc, err2 := h.Open()
 
-	defer func(filerc multipart.File) {
-		err := filerc.Close()
-		if err != nil {
-			log.Error("error: ", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-	}(filerc)
 	if err1 != nil {
 		log.Error("error: ", err1)
 		http.Error(w, err1.Error(), http.StatusBadRequest)
 	}
+
 	if err2 != nil {
 		log.Error("error: ", err2)
 		http.Error(w, err2.Error(), http.StatusBadRequest)
 	}
 
-	buf := new(bytes.Buffer)
-	_, err22 := buf.ReadFrom(filerc)
-	if err22 != nil {
-		log.Error("error: ", err22)
-		http.Error(w, err22.Error(), http.StatusInternalServerError)
-		return
-	}
-	//contents := buf.String()
-	//encodedPhoto := b64.StdEncoding.EncodeToString([]byte(contents))
-	//fmt.Println(encodedPhoto)
+	defer func(filerc multipart.File) {
+		erri := filerc.Close()
+		if erri != nil {
+			log.Error("error: ", erri)
+			http.Error(w, erri.Error(), http.StatusInternalServerError)
+		}
+	}(filerc)
 
-	photo := rt.memdb.SavePhoto(username, buf.Bytes())
-	body, err3 := json.Marshal(photo)
+	buf := new(bytes.Buffer)
+	_, err3 := buf.ReadFrom(filerc)
 	if err3 != nil {
 		log.Error("error: ", err3)
 		http.Error(w, err3.Error(), http.StatusInternalServerError)
 		return
 	}
-	_, err4 := w.Write(body)
+	// contents := buf.String()
+	// encodedPhoto := b64.StdEncoding.EncodeToString([]byte(contents))
+	// fmt.Println(encodedPhoto)
+
+	photo := rt.memdb.SavePhoto(username, buf.Bytes())
+	body, err4 := json.Marshal(photo)
 	if err4 != nil {
 		log.Error("error: ", err4)
 		http.Error(w, err4.Error(), http.StatusInternalServerError)
 		return
 	}
-	/*
-		//Access the name key - First Approach
-		fmt.Println(r.Form["username"])
-		//Access the name key - Second Approach
-		fmt.Println(r.PostForm["username"])
-		//Access the name key - Third Approach
-		fmt.Println(r.MultipartForm.Value["username"])
-		//Access the name key - Fourth Approach
-		//
-		//Access the name key - First Approach
-		fmt.Println(r.Form["file"])
-		//Access the name key - Second Approach
-		fmt.Println(r.PostForm["file"])
-		//Access the name key - Third Approach
-		fmt.Println(r.MultipartForm.Value["file"])
-		//Access the name key - Fourth Approach
-	*/
-
+	_, err5 := w.Write(body)
+	if err5 != nil {
+		log.Error("error: ", err5)
+		http.Error(w, err5.Error(), http.StatusInternalServerError)
+		return
+	}
 }
