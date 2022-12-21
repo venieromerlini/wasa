@@ -10,6 +10,8 @@ import (
 // Handler returns an instance of httprouter.Router that handle APIs registered here
 func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	log := rt.baseLogger
+	log.Info("invoked ", r.URL.Path)
+
 	var sessionBody model.SessionBody
 	err := json.NewDecoder(r.Body).Decode(&sessionBody)
 	if err != nil {

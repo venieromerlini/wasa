@@ -11,6 +11,7 @@ import (
 // Handler returns an instance of httprouter.Router that handle APIs registered here
 func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	log := rt.baseLogger
+	log.Info("invoked ", r.URL.Path)
 	var commentRequest model.CommentRequest
 	err := json.NewDecoder(r.Body).Decode(&commentRequest)
 	if err != nil {
@@ -32,12 +33,17 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 		http.Error(w, err2.Error(), http.StatusInternalServerError)
 		return
 	}
-
 }
 
 func (rt *_router) findAllComments(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	log := rt.baseLogger
-	// requestorUser := r.Header.Get("X-User-Session-Identifier")
+	log.Info("invoked ", r.URL.Path)
+	requestorUser := r.Header.Get("X-User-Session-Identifier")
+	if requestorUser == "" {
+		log.Error("cannot invoke : ", r.URL.Path, "without authentication")
+		http.Error(w, "", http.StatusUnauthorized)
+		return
+	}
 	photoId := r.URL.Query().Get("photoId")
 	photoIdInt, err0 := strconv.ParseInt(photoId, 10, 64)
 	if err0 != nil {
@@ -63,6 +69,7 @@ func (rt *_router) findAllComments(w http.ResponseWriter, r *http.Request, ps ht
 
 func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	log := rt.baseLogger
+	log.Info("invoked ", r.URL.Path)
 	username := r.Header.Get("X-User-Session-Identifier")
 	id := ps.ByName("commentId")
 	inInt64, err := strconv.ParseInt(id, 10, 64)

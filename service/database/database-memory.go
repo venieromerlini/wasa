@@ -35,8 +35,8 @@ type AppDatabaseMemory interface {
 	FindPhoto(photoId int64) (model.Photo, error)
 
 	UpdateUsername(requestorUser string, oldUsername string, newUsername string) model.User
-	FindUserHomePageByUsername(username string) model.UserHomePage
-	FindUserProfileByUsername(username string) model.Profile
+	FindUserHomePageByUsername(username string) (model.UserHomePage, error)
+	FindUserProfileByUsername(username string) (model.Profile, error)
 }
 
 type appdbmemimpl struct {
@@ -50,14 +50,17 @@ type appdbmemimpl struct {
 	sequence    map[int64]int64
 }
 
-func (m appdbmemimpl) FindUserProfileByUsername(username string) model.Profile {
+func (m appdbmemimpl) FindUserProfileByUsername(username string) (model.Profile, error) {
 	profile := new(model.Profile)
-	user := m.findUserByUsername(username)
+	user, err := m.findUserByUsername(username)
+	if err != nil {
+		return model.Profile{}, err
+	}
 	profile.User = &user
 	profile.Photos = m.FindAllPhotos(username)
 	profile.Followees = m.FindAllFollow(username)
 	profile.Followers = m.findAllFollowers(username)
-	return *profile
+	return *profile, nil
 }
 
 func (m appdbmemimpl) UpdateUsername(_ string, oldUsername string, newUsername string) model.User {
@@ -72,7 +75,7 @@ func (m appdbmemimpl) UpdateUsername(_ string, oldUsername string, newUsername s
 
 /*
 UserStream // Each user will be presented with a stream of photos (images) in reverse chronological order,
-with information about when each photo was uploaded (date and time  and how many likes and comments it has.
+with information about when each photo was uploaded date and time  and how many likes and comments it has.
 The stream is composed by photos from “following” (other users that the user follows).
 */
 func (m appdbmemimpl) subtract(from []string, what []string) []string {
@@ -95,7 +98,11 @@ func (m appdbmemimpl) subtract(from []string, what []string) []string {
 	return final
 }
 
-func (m appdbmemimpl) FindUserHomePageByUsername(username string) model.UserHomePage {
+func (m appdbmemimpl) FindUserHomePageByUsername(username string) (model.UserHomePage, error) {
+	user, err := m.findUserByUsername(username)
+	if err != nil {
+		return model.UserHomePage{}, err
+	}
 	follows := m.FindAllFollow(username)
 	bans := m.findAllBanners(username)
 
@@ -119,18 +126,22 @@ func (m appdbmemimpl) FindUserHomePageByUsername(username string) model.UserHome
 	})
 	homepage := new(model.UserHomePage)
 	homepage.Id = 0
-	user := m.findUserByUsername(username)
+
 	homepage.User = &user
 	homepage.Followees = follows
 	homepage.Photos = photos
-	return *homepage
+	return *homepage, nil
 }
 
-func (m appdbmemimpl) findUserByUsername(username string) model.User {
+func (m appdbmemimpl) findUserByUsername(username string) (model.User, error) {
 	user := new(model.User)
-	user.Id = m.userIdsMap[username]
-	user.Username = username
-	return *user
+	id, ok := m.userIdsMap[username]
+	if ok {
+		user.Id = id
+		user.Username = username
+		return *user, nil
+	}
+	return model.User{}, errors.New("no user")
 }
 
 func (m appdbmemimpl) FindPhoto(photoId int64) (model.Photo, error) {
@@ -306,19 +317,15 @@ func (m appdbmemimpl) SaveFollow(followRequest model.FollowRequest) model.Follow
 
 func (m appdbmemimpl) FindAllFollow(username string) []model.Follow {
 	var follows []model.Follow
-	if username != "" {
-		for _, follow := range m.followsMap {
-			if follow.User.Id == m.userIdsMap[username] {
-				follow.User.Username = m.usersMap[follow.User.Id].Username
-				follow.Followee.Username = m.usersMap[follow.Followee.Id].Username
-				follows = append(follows, follow)
-			}
-		}
-	} else {
-		for _, follow := range m.followsMap {
+
+	for _, follow := range m.followsMap {
+		if follow.User.Id == m.userIdsMap[username] {
+			follow.User.Username = m.usersMap[follow.User.Id].Username
+			follow.Followee.Username = m.usersMap[follow.Followee.Id].Username
 			follows = append(follows, follow)
 		}
 	}
+
 	if len(follows) == 0 {
 		follows = make([]model.Follow, 0)
 	}
@@ -327,15 +334,15 @@ func (m appdbmemimpl) FindAllFollow(username string) []model.Follow {
 
 func (m appdbmemimpl) findAllFollowers(username string) []model.Follow {
 	var follows []model.Follow
-	if username != "" {
-		for _, follow := range m.followsMap {
-			if follow.Followee.Id == m.userIdsMap[username] {
-				follow.User.Username = m.usersMap[follow.User.Id].Username
-				follow.Followee.Username = m.usersMap[follow.Followee.Id].Username
-				follows = append(follows, follow)
-			}
+
+	for _, follow := range m.followsMap {
+		if follow.Followee.Id == m.userIdsMap[username] {
+			follow.User.Username = m.usersMap[follow.User.Id].Username
+			follow.Followee.Username = m.usersMap[follow.Followee.Id].Username
+			follows = append(follows, follow)
 		}
 	}
+
 	if len(follows) == 0 {
 		follows = make([]model.Follow, 0)
 	}
@@ -377,15 +384,15 @@ func (m appdbmemimpl) existsBan(banRequest model.BanRequest) (bool, model.Ban) {
 
 func (m appdbmemimpl) FindAllBans(username string) []model.Ban {
 	var bans []model.Ban
-	if username != "" {
-		for _, ban := range m.bansMap {
-			if ban.User.Id == m.userIdsMap[username] {
-				ban.User.Username = m.usersMap[ban.User.Id].Username
-				ban.Banned.Username = m.usersMap[ban.Banned.Id].Username
-				bans = append(bans, ban)
-			}
+
+	for _, ban := range m.bansMap {
+		if ban.User.Id == m.userIdsMap[username] {
+			ban.User.Username = m.usersMap[ban.User.Id].Username
+			ban.Banned.Username = m.usersMap[ban.Banned.Id].Username
+			bans = append(bans, ban)
 		}
 	}
+
 	if len(bans) == 0 {
 		bans = make([]model.Ban, 0)
 	}
@@ -394,15 +401,15 @@ func (m appdbmemimpl) FindAllBans(username string) []model.Ban {
 
 func (m appdbmemimpl) findAllBanners(username string) []model.Ban {
 	var bans []model.Ban
-	if username != "" {
-		for _, ban := range m.bansMap {
-			if ban.Banned.Id == m.userIdsMap[username] {
-				ban.User.Username = m.usersMap[ban.User.Id].Username
-				ban.Banned.Username = m.usersMap[ban.Banned.Id].Username
-				bans = append(bans, ban)
-			}
+
+	for _, ban := range m.bansMap {
+		if ban.Banned.Id == m.userIdsMap[username] {
+			ban.User.Username = m.usersMap[ban.User.Id].Username
+			ban.Banned.Username = m.usersMap[ban.Banned.Id].Username
+			bans = append(bans, ban)
 		}
 	}
+
 	if len(bans) == 0 {
 		bans = make([]model.Ban, 0)
 	}

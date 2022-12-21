@@ -11,6 +11,7 @@ import (
 
 func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	log := rt.baseLogger
+	log.Info("invoked ", r.URL.Path)
 	username := r.Header.Get("X-User-Session-Identifier")
 	id := ps.ByName("photoId")
 	inInt64, err := strconv.ParseInt(id, 10, 64)
@@ -23,6 +24,7 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 
 func (rt *_router) findUserPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	log := rt.baseLogger
+	log.Info("invoked ", r.URL.Path)
 	photoId := ps.ByName("photoId")
 	photoIdInt, err := strconv.ParseInt(photoId, 10, 64)
 	if err != nil {

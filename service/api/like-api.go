@@ -11,6 +11,7 @@ import (
 // Handler returns an instance of httprouter.Router that handle APIs registered here
 func (rt *_router) findAllLikes(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	log := rt.baseLogger
+	log.Info("invoked ", r.URL.Path)
 	// requestorUser := r.Header.Get("X-User-Session-Identifier")
 	photoId := r.URL.Query().Get("photoId")
 	photoIdInt, err0 := strconv.ParseInt(photoId, 10, 64)
@@ -38,6 +39,7 @@ func (rt *_router) findAllLikes(w http.ResponseWriter, r *http.Request, ps httpr
 
 func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	log := rt.baseLogger
+	log.Info("invoked ", r.URL.Path)
 	var likeRequest model.LikeRequest
 	err := json.NewDecoder(r.Body).Decode(&likeRequest)
 	if err != nil {
@@ -64,6 +66,7 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 
 func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	log := rt.baseLogger
+	log.Info("invoked ", r.URL.Path)
 	username := r.Header.Get("X-User-Session-Identifier")
 	id := ps.ByName("likeId")
 	inInt64, err := strconv.ParseInt(id, 10, 64)

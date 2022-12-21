@@ -52,6 +52,7 @@ type Config struct {
 	MemDatabase database.AppDatabaseMemory
 	// Database is the instance of database.AppDatabase where data are saved
 	Database database.AppDatabase
+	Util     Util
 }
 
 // Router is the package API interface representing an API handler builder
@@ -84,16 +85,16 @@ func New(cfg Config) (Router, error) {
 		baseLogger: cfg.Logger,
 		db:         cfg.Database,
 		memdb:      cfg.MemDatabase,
+		util:       cfg.Util,
 	}, nil
 }
 
 type _router struct {
 	router *httprouter.Router
-
 	// baseLogger is a logger for non-requests contexts, like goroutines or background tasks not started by a request.
 	// Use context logger if available (e.g., in requests) instead of this logger.
 	baseLogger logrus.FieldLogger
-
-	db    database.AppDatabase
-	memdb database.AppDatabaseMemory
+	db         database.AppDatabase
+	memdb      database.AppDatabaseMemory
+	util       Util
 }

@@ -107,6 +107,8 @@ func run() error {
 		logger.WithError(err).Error("error creating MemoryAppDatabase")
 		return fmt.Errorf("creating MemoryAppDatabase: %w", errm)
 	}
+
+	util := api.NewUtil(logger)
 	// Start (main) API server
 	logger.Info("initializing API server")
 	// Make a channel to listen for an interrupt or terminate signal from the OS.
@@ -123,6 +125,7 @@ func run() error {
 		Logger:      logger,
 		Database:    db,
 		MemDatabase: memdb,
+		Util:        util,
 	})
 
 	populateMockData(memdb, logger)
@@ -212,7 +215,7 @@ func populateMockData(memdb database.AppDatabaseMemory, logger *logrus.Logger) {
 	}
 
 	veniero := new(model.User)
-	veniero.Username = "veniero"
+	veniero.Username = "veniero2"
 
 	pippo := new(model.User)
 	pippo.Username = "pippo"
@@ -265,10 +268,6 @@ func populateMockData(memdb database.AppDatabaseMemory, logger *logrus.Logger) {
 		PhotoId: photo1.Id,
 	})
 
-	memdb.SaveLike(model.LikeRequest{
-		User:    veniero,
-		PhotoId: photo1.Id,
-	})
-	memdb.UpdateUsername("_", veniero.Username, "veniero2")
+	memdb.UpdateUsername("_", veniero.Username, "veniero")
 
 }

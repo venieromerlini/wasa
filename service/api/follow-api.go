@@ -10,6 +10,7 @@ import (
 
 func (rt *_router) findAllFollows(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	log := rt.baseLogger
+	log.Info("invoked ", r.URL.Path)
 	// username := r.Header.Get("X-User-Session-Identifier")
 	username := r.URL.Query().Get("username")
 	follows := rt.memdb.FindAllFollow(username)
@@ -30,6 +31,7 @@ func (rt *_router) findAllFollows(w http.ResponseWriter, r *http.Request, ps htt
 
 func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	log := rt.baseLogger
+	log.Info("invoked ", r.URL.Path)
 	var followRequest model.FollowRequest
 	err := json.NewDecoder(r.Body).Decode(&followRequest)
 	if err != nil {
@@ -56,6 +58,7 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 
 func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	log := rt.baseLogger
+	log.Info("invoked ", r.URL.Path)
 	requestorUser := r.Header.Get("X-User-Session-Identifier")
 	id := ps.ByName("banId")
 	inInt64, err := strconv.ParseInt(id, 10, 64)

@@ -9,85 +9,93 @@ import (
 
 func (rt *_router) findAllUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	log := rt.baseLogger
+	log.Info("invoked ", r.URL.Path)
+
 	users := rt.memdb.FindAllUsers()
-	body, err1 := json.Marshal(users)
-	if err1 != nil {
-		log.Error("error: ", err1)
-		http.Error(w, err1.Error(), http.StatusInternalServerError)
+	body, errParse := json.Marshal(users)
+	if errParse != nil {
+		rt.util.WriteError500(w, errParse)
 		return
 	}
-	w.Header().Set("content-type", "application/json")
-	_, err2 := w.Write(body)
-	if err2 != nil {
-		log.Error("error: ", err2)
-		http.Error(w, err2.Error(), http.StatusInternalServerError)
-		return
+
+	errResponse := rt.util.WriteResponse(w, body)
+	if errResponse != nil {
+		rt.util.WriteError500(w, errResponse)
 	}
 }
 
 func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	log := rt.baseLogger
 	log.Info("invoked ", r.URL.Path)
-	username := ps.ByName("username")
-	homepage := rt.memdb.FindUserHomePageByUsername(username)
-	body, err1 := json.Marshal(homepage)
-	if err1 != nil {
-		log.Error("error: ", err1)
-		http.Error(w, err1.Error(), http.StatusInternalServerError)
+	_, errAuth := rt.util.GetAuthToken(r)
+	if errAuth != nil {
+		rt.util.WriteError401(w, errAuth)
 		return
 	}
-	_, err2 := w.Write(body)
-	if err2 != nil {
-		log.Error("error: ", err2)
-		http.Error(w, err2.Error(), http.StatusInternalServerError)
+	username := ps.ByName("username")
+	homepage, errDb := rt.memdb.FindUserHomePageByUsername(username)
+	if errDb != nil {
+		rt.util.WriteError404(w, errDb)
 		return
+	}
+
+	body, errParse := json.Marshal(homepage)
+	if errParse != nil {
+		rt.util.WriteError500(w, errParse)
+		return
+	}
+
+	errResponse := rt.util.WriteResponse(w, body)
+	if errResponse != nil {
+		rt.util.WriteError500(w, errResponse)
 	}
 }
 
 func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	log := rt.baseLogger
 	log.Info("invoked ", r.URL.Path)
-	username := ps.ByName("username")
-	userProfile := rt.memdb.FindUserProfileByUsername(username)
-	body, err1 := json.Marshal(userProfile)
-	if err1 != nil {
-		log.Error("error: ", err1)
-		http.Error(w, err1.Error(), http.StatusInternalServerError)
+	_, errAuth := rt.util.GetAuthToken(r)
+	if errAuth != nil {
+		rt.util.WriteError401(w, errAuth)
 		return
 	}
-	_, err2 := w.Write(body)
-	if err2 != nil {
-		log.Error("error: ", err2)
-		http.Error(w, err2.Error(), http.StatusInternalServerError)
+	username := ps.ByName("username")
+	userProfile, errDb := rt.memdb.FindUserProfileByUsername(username)
+	if errDb != nil {
+		rt.util.WriteError404(w, errDb)
 		return
+	}
+
+	body, errParse := json.Marshal(userProfile)
+	if errParse != nil {
+		rt.util.WriteError500(w, errParse)
+		return
+	}
+
+	errResponse := rt.util.WriteResponse(w, body)
+	if errResponse != nil {
+		rt.util.WriteError500(w, errResponse)
 	}
 }
 
 func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	log := rt.baseLogger
-	requestorUser := r.Header.Get("X-User-Session-Identifier")
-	oldUsername := ps.ByName("username")
-
-	var newUser model.User
-	err := json.NewDecoder(r.Body).Decode(&newUser)
+	log.Info("invoked ", r.URL.Path)
+	requestorUser, err := rt.util.GetAuthToken(r)
 	if err != nil {
-		log.Error("error: ", err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		rt.util.WriteError401(w, err)
+	}
+	oldUsername := ps.ByName("username")
+	var newUser model.User
+	errDecode := json.NewDecoder(r.Body).Decode(&newUser)
+	if errDecode != nil {
+		rt.util.WriteError400(w, errDecode)
 		return
 	}
 
 	user := rt.memdb.UpdateUsername(requestorUser, oldUsername, newUser.Username)
-	w.Header().Set("content-type", "application/json")
-	body, err1 := json.Marshal(user)
-	if err1 != nil {
-		log.Error("error: ", err1)
-		http.Error(w, err1.Error(), http.StatusInternalServerError)
-		return
-	}
-	_, err2 := w.Write(body)
-	if err2 != nil {
-		log.Error("error: ", err2)
-		http.Error(w, err2.Error(), http.StatusInternalServerError)
-		return
+	body, err := json.Marshal(user)
+	if rt.util.WriteResponse(w, body) != nil {
+		rt.util.WriteError500(w, err)
 	}
 }

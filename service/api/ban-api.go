@@ -10,6 +10,8 @@ import (
 
 func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	log := rt.baseLogger
+
+	log.Info("invoked ", r.URL.Path)
 	var banRequest model.BanRequest
 	err := json.NewDecoder(r.Body).Decode(&banRequest)
 	if err != nil {
@@ -35,6 +37,7 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 
 func (rt *_router) findAllBans(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	log := rt.baseLogger
+	log.Info("invoked ", r.URL.Path)
 	username := r.URL.Query().Get("username")
 	bans := rt.memdb.FindAllBans(username)
 	body, err := json.Marshal(bans)
@@ -54,6 +57,7 @@ func (rt *_router) findAllBans(w http.ResponseWriter, r *http.Request, ps httpro
 
 func (rt *_router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	log := rt.baseLogger
+	log.Info("invoked ", r.URL.Path)
 	username := r.Header.Get("X-User-Session-Identifier")
 	id := ps.ByName("banId")
 	inInt64, err := strconv.ParseInt(id, 10, 64)
