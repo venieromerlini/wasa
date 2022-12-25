@@ -4,6 +4,7 @@ import (
 	"errors"
 	"sort"
 	"strconv"
+	"sync"
 	"time"
 	"wasa/service/model"
 )
@@ -48,6 +49,7 @@ type appdbmemimpl struct {
 	likesMap    map[int64]model.Like
 	photosMaps  map[int64]model.Photo
 	sequence    map[int64]int64
+	lock        sync.Mutex
 }
 
 func (m appdbmemimpl) FindUserProfileByUsername(username string) (model.Profile, error) {
@@ -67,9 +69,11 @@ func (m appdbmemimpl) UpdateUsername(_ string, oldUsername string, newUsername s
 	user := new(model.User)
 	user.Id = m.userIdsMap[oldUsername]
 	user.Username = newUsername
+	m.lock.Lock()
 	m.usersMap[user.Id] = *user
 	m.userIdsMap[newUsername] = user.Id
 	delete(m.userIdsMap, oldUsername)
+	m.lock.Unlock()
 	return *user
 }
 
@@ -150,6 +154,7 @@ func (m appdbmemimpl) FindPhoto(photoId int64) (model.Photo, error) {
 		photo.User.Username = m.usersMap[photo.User.Id].Username
 		photo.Likes = m.FindAllLikes(photo.Id)
 		photo.Comments = m.FindAllComments(photo.Id)
+
 	} else {
 		return photo, errors.New("empty name")
 	}
@@ -163,8 +168,14 @@ func (m appdbmemimpl) FindAllPhotos(username string) []model.Photo {
 		for _, photo := range m.photosMaps {
 			if photo.User.Id == m.userIdsMap[username] {
 				photo.User.Username = m.usersMap[photo.User.Id].Username
+
 				photo.Likes = m.FindAllLikes(photo.Id)
 				photo.Comments = m.FindAllComments(photo.Id)
+
+				sort.Slice(photo.Comments, func(i, j int) bool {
+					return photo.Comments[i].Id > photo.Comments[j].Id
+				})
+
 				photos = append(photos, photo)
 			}
 		}
@@ -182,14 +193,16 @@ func (m appdbmemimpl) DeletePhoto(requestorUser string, id int64) {
 	elem, ok := m.photosMaps[id]
 	if ok && elem.User.Username == requestorUser {
 		likes := m.FindAllLikes(id)
+		comments := m.FindAllComments(id)
+		m.lock.Lock()
 		for _, like := range likes {
 			delete(m.likesMap, like.Id)
 		}
-		comments := m.FindAllComments(id)
 		for _, comment := range comments {
 			delete(m.commentsMap, comment.Id)
 		}
 		delete(m.photosMaps, id)
+		m.lock.Unlock()
 	}
 }
 
@@ -201,9 +214,11 @@ func (m appdbmemimpl) SavePhoto(username string, bytes []byte) model.Photo {
 	photo.User.Id = user.Id
 	photo.Data = bytes
 	photo.UploadDate = time.Now()
+	m.lock.Lock()
 	photo.Id = m.incrementAndGet()
 	photo.Link = "/photos/" + strconv.Itoa(int(photo.Id))
 	m.photosMaps[photo.Id] = *photo
+	m.lock.Unlock()
 	return *photo
 }
 
@@ -237,34 +252,44 @@ func (m appdbmemimpl) SaveLike(likeRequest model.LikeRequest) model.Like {
 	if ok {
 		return like
 	}
+	m.lock.Lock()
 	like.Id = m.incrementAndGet()
+	likeRequest.User.Id = m.userIdsMap[likeRequest.User.Username]
 	like.User = likeRequest.User
 	like.PhotoId = likeRequest.PhotoId
 	m.likesMap[like.Id] = like
+	m.lock.Unlock()
 	return like
 }
 
 func (m appdbmemimpl) DeleteLike(requestorUser string, id int64) {
 	elem, ok := m.likesMap[id]
 	if ok && elem.User.Username == requestorUser {
+		m.lock.Lock()
 		delete(m.likesMap, id)
+		m.lock.Unlock()
 	}
 }
 
 func (m appdbmemimpl) DeleteComment(requestorUser string, id int64) {
 	elem, ok := m.commentsMap[id]
 	if ok && elem.User.Username == requestorUser {
+		m.lock.Lock()
 		delete(m.commentsMap, id)
+		m.lock.Unlock()
 	}
 }
 
 func (m appdbmemimpl) SaveComment(commentRequest model.CommentRequest) model.Comment {
 	comment := new(model.Comment)
+	m.lock.Lock()
 	comment.Id = m.incrementAndGet()
 	comment.User = commentRequest.User
+	comment.User.Id = m.userIdsMap[commentRequest.User.Username]
 	comment.PhotoId = commentRequest.PhotoId
 	comment.Text = commentRequest.Text
 	m.commentsMap[comment.Id] = *comment
+	m.lock.Unlock()
 	return *comment
 }
 
@@ -288,7 +313,9 @@ func (m appdbmemimpl) FindAllComments(photoId int64) []model.Comment {
 func (m appdbmemimpl) DeleteFollow(requestorUser string, id int64) {
 	elem, ok := m.followsMap[id]
 	if ok && elem.User.Username == requestorUser {
+		m.lock.Lock()
 		delete(m.followsMap, id)
+		m.lock.Unlock()
 	}
 }
 
@@ -306,12 +333,16 @@ func (m appdbmemimpl) SaveFollow(followRequest model.FollowRequest) model.Follow
 	if ok {
 		return follow
 	}
+	m.lock.Lock()
 	follow.Id = m.incrementAndGet()
+	m.lock.Unlock()
 	follow.User = followRequest.User
 	follow.User.Id = m.userIdsMap[followRequest.User.Username]
 	follow.Followee = followRequest.Followee
 	follow.Followee.Id = m.userIdsMap[followRequest.Followee.Username]
+	m.lock.Lock()
 	m.followsMap[follow.Id] = follow
+	m.lock.Unlock()
 	return follow
 }
 
@@ -352,7 +383,9 @@ func (m appdbmemimpl) findAllFollowers(username string) []model.Follow {
 func (m appdbmemimpl) DeleteBan(requestorUser string, id int64) {
 	elem, ok := m.bansMap[id]
 	if ok && elem.User.Username == requestorUser {
+		m.lock.Lock()
 		delete(m.bansMap, id)
+		m.lock.Unlock()
 	}
 }
 
@@ -366,10 +399,12 @@ func (m appdbmemimpl) SaveBan(banRequest model.BanRequest) model.Ban {
 	if ok {
 		return ban
 	}
+	m.lock.Lock()
 	ban.Id = m.incrementAndGet()
 	ban.User = banRequest.User
 	ban.Banned = banRequest.Banned
 	m.bansMap[ban.Id] = ban
+	m.lock.Unlock()
 	return ban
 }
 
@@ -430,10 +465,12 @@ func (m appdbmemimpl) SaveUser(username string) model.User {
 		return m.usersMap[e]
 	} else {
 		user := new(model.User)
+		m.lock.Lock()
 		user.Id = m.incrementAndGet()
 		user.Username = username
 		m.usersMap[user.Id] = *user
 		m.userIdsMap[username] = user.Id
+		m.lock.Unlock()
 		return *user
 	}
 }

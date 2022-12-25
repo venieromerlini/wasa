@@ -37,6 +37,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 	"wasa/service/api"
 	"wasa/service/database"
 	"wasa/service/globaltime"
@@ -128,7 +129,7 @@ func run() error {
 		Util:        util,
 	})
 
-	populateMockData(memdb, logger)
+	go populateMockData(memdb, logger)
 
 	if err != nil {
 		logger.WithError(err).Error("error creating the API server instance")
@@ -228,7 +229,11 @@ func populateMockData(memdb database.AppDatabaseMemory, logger *logrus.Logger) {
 	memdb.SaveUser(topolino.Username)
 
 	photo1 := memdb.SavePhoto(veniero.Username, photo1Dec)
-	memdb.SavePhoto(pippo.Username, photo2Dec)
+	time.Sleep(1 * time.Second)
+	photo2 := memdb.SavePhoto(pippo.Username, photo2Dec)
+	time.Sleep(1 * time.Second)
+	photo3 := memdb.SavePhoto(pippo.Username, photo1Dec)
+	time.Sleep(1 * time.Second)
 	memdb.SavePhoto(topolino.Username, photo2Dec)
 
 	memdb.SaveFollow(model.FollowRequest{
@@ -254,18 +259,32 @@ func populateMockData(memdb database.AppDatabaseMemory, logger *logrus.Logger) {
 	memdb.SaveComment(model.CommentRequest{
 		User:    veniero,
 		PhotoId: photo1.Id,
-		Text:    "Beautiful!",
+		Text:    "Che bel fiore!",
 	})
 
 	memdb.SaveComment(model.CommentRequest{
 		User:    pippo,
 		PhotoId: photo1.Id,
-		Text:    "Beautiful!",
+		Text:    "Congratulazioni",
 	})
 
 	memdb.SaveLike(model.LikeRequest{
 		User:    veniero,
 		PhotoId: photo1.Id,
+	})
+
+	memdb.SaveLike(model.LikeRequest{
+		User:    veniero,
+		PhotoId: photo2.Id,
+	})
+	memdb.SaveLike(model.LikeRequest{
+		User:    pippo,
+		PhotoId: photo3.Id,
+	})
+
+	memdb.SaveLike(model.LikeRequest{
+		User:    topolino,
+		PhotoId: photo3.Id,
 	})
 
 	memdb.UpdateUsername("_", veniero.Username, "veniero")

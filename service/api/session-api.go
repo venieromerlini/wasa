@@ -14,7 +14,7 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 
 	var sessionBody model.SessionBody
 	err := json.NewDecoder(r.Body).Decode(&sessionBody)
-	if err != nil {
+	if err != nil || sessionBody.Name == "" {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -28,11 +28,10 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 		http.Error(w, err1.Error(), http.StatusInternalServerError)
 		return
 	}
-	log.Info("response: ", string(body))
+
 	w.Header().Set("X-user-session-identifier", successfulLogin.Identifier)
-	_, err2 := w.Write(body)
-	if err2 != nil {
-		http.Error(w, err2.Error(), http.StatusInternalServerError)
-		return
+	errResponse := rt.util.WriteResponse(w, body)
+	if errResponse != nil {
+		rt.util.WriteError500(w, errResponse)
 	}
 }
