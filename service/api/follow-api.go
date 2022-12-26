@@ -60,7 +60,7 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 	log := rt.baseLogger
 	log.Info("invoked ", r.URL.Path)
 	requestorUser := r.Header.Get("X-User-Session-Identifier")
-	id := ps.ByName("banId")
+	id := ps.ByName("followId")
 	inInt64, err := strconv.ParseInt(id, 10, 64)
 	if err != nil {
 		log.Error("error: ", err)

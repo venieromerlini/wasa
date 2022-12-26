@@ -35,6 +35,11 @@ export default {
   },
   mounted() {
     this.refresh()
+    var myCollapse = document.getElementById('sidebarMenu')
+    var bsCollapse = new bootstrap.Collapse(myCollapse, {
+      toggle: false
+    })
+    bsCollapse.hide()
   }
 }
 </script>
@@ -43,7 +48,9 @@ export default {
   <div>
 
     <h1 class="h2">Welcome, {{ username }}</h1>
-    <Photo v-for="photo in data['photos']"
+    <Photo v-for="(photo, index)  in data['photos']"
+           :key="index"
+           :showDetails="true"
            :username="photo.user.username"
            :id="photo.id"
            :uploadDate="photo.uploadDate"

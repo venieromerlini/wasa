@@ -126,7 +126,7 @@ func (m appdbmemimpl) FindUserHomePageByUsername(username string) (model.UserHom
 	}
 
 	sort.Slice(photos, func(i, j int) bool {
-		return photos[i].UploadDate.Before(photos[j].UploadDate)
+		return photos[i].UploadDate.After(photos[j].UploadDate)
 	})
 	homepage := new(model.UserHomePage)
 	homepage.Id = 0
@@ -402,7 +402,9 @@ func (m appdbmemimpl) SaveBan(banRequest model.BanRequest) model.Ban {
 	m.lock.Lock()
 	ban.Id = m.incrementAndGet()
 	ban.User = banRequest.User
+	ban.User.Id = m.userIdsMap[banRequest.User.Username]
 	ban.Banned = banRequest.Banned
+	ban.Banned.Id = m.userIdsMap[banRequest.Banned.Username]
 	m.bansMap[ban.Id] = ban
 	m.lock.Unlock()
 	return ban

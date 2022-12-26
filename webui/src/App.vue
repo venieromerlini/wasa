@@ -58,7 +58,7 @@ export default {
               </li>
 
               <li class="nav-item" v-if="isUserLogged">
-                <RouterLink to="/" class="nav-link">
+                <RouterLink to="/home" class="nav-link">
                   <svg class="feather"><use href="/feather-sprite-v4.29.0.svg#home"/></svg>
                   Home
                 </RouterLink>

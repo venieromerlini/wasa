@@ -204,7 +204,7 @@ func populateMockData(memdb database.AppDatabaseMemory, logger *logrus.Logger) {
 
 	// MOCK DATA
 
-	photo1b64 := "Qk2KAAAAAAAAADYAAAAoAAAABAAAAAcAAAABABgAAAAAAFQAAAAAAAAAAAAAAAAAAAAAAAAA6KIA////////////////////////////////////////////TLEi////////////////////////////////////////////JBzt////////////"
+	photo1b64 := "iVBORw0KGgoAAAANSUhEUgAAAAsAAAALCAYAAACprHcmAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAABdSURBVChTY/wPBAxI4J2sKpTFwCD0+DaUBQFMUJoowPhWRgVuMsgkdJOR+SgmgyRgVqMrBAEmdHfhAiB1JHkQrBibO9GdAeIzobsLFwCpQ/Egsmkw05EBrSKFgQEAciA8LnIAvlsAAAAASUVORK5CYII="
 	photo1Dec, erroremock := b64.StdEncoding.DecodeString(photo1b64)
 	if erroremock != nil {
 		logger.Error("error: ", erroremock)
@@ -224,21 +224,32 @@ func populateMockData(memdb database.AppDatabaseMemory, logger *logrus.Logger) {
 	topolino := new(model.User)
 	topolino.Username = "topolino"
 
+	paperino := new(model.User)
+	paperino.Username = "paperino"
+
 	memdb.SaveUser(veniero.Username)
 	memdb.SaveUser(pippo.Username)
 	memdb.SaveUser(topolino.Username)
+	memdb.SaveUser(paperino.Username)
 
 	photo1 := memdb.SavePhoto(veniero.Username, photo1Dec)
 	time.Sleep(1 * time.Second)
 	photo2 := memdb.SavePhoto(pippo.Username, photo2Dec)
 	time.Sleep(1 * time.Second)
+	memdb.SavePhoto(topolino.Username, photo2Dec)
+	time.Sleep(1 * time.Second)
 	photo3 := memdb.SavePhoto(pippo.Username, photo1Dec)
 	time.Sleep(1 * time.Second)
-	memdb.SavePhoto(topolino.Username, photo2Dec)
+	memdb.SavePhoto(paperino.Username, photo2Dec)
 
 	memdb.SaveFollow(model.FollowRequest{
 		User:     veniero,
 		Followee: pippo,
+	})
+
+	memdb.SaveFollow(model.FollowRequest{
+		User:     veniero,
+		Followee: paperino,
 	})
 
 	memdb.SaveFollow(model.FollowRequest{
@@ -251,9 +262,14 @@ func populateMockData(memdb database.AppDatabaseMemory, logger *logrus.Logger) {
 		Followee: veniero,
 	})
 
+	memdb.SaveFollow(model.FollowRequest{
+		User:     topolino,
+		Followee: veniero,
+	})
+
 	memdb.SaveBan(model.BanRequest{
-		User:   topolino,
-		Banned: veniero,
+		User:   veniero,
+		Banned: paperino,
 	})
 
 	memdb.SaveComment(model.CommentRequest{

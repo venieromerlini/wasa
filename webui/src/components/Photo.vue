@@ -2,12 +2,11 @@
 import {mutations, store} from "@/services/store";
 
 export default {
-  props: ['username', 'id', 'uploadDate', 'link', 'comments', 'likes'],
+  props: ['showDetails', 'username', 'id', 'uploadDate', 'link', 'comments', 'likes'],
   data: function () {
     return {
       toggleCommentBoxes: [],
       commentText: ''
-
     }
   },
   methods: {
@@ -16,6 +15,9 @@ export default {
         return "You"
       }
       return username.charAt(0).toUpperCase() + username.slice(1);
+    },
+    isCurrentUser(username){
+      return username === store.username
     },
     userAlreadyLikedThisPhoto() {
       return this.likes && this.likes.map(x => x.user.username).includes(store.username)
@@ -91,7 +93,20 @@ export default {
         this.errormsg = e.toString();
       }
       this.$emit('refreshDataRequest', 'VOID')
-
+    },
+    deleteComment(commentId){
+      try {
+        const config = {
+          headers: {
+            [store.authToken]: store.token
+          }
+        };
+        this.$axios.delete(store.baseUrl + "/comments/" + commentId,
+            config)
+      } catch (e) {
+        this.errormsg = e.toString();
+      }
+      this.$emit('refreshDataRequest', 'VOID')
     }
   },
   mounted() {
@@ -109,16 +124,19 @@ h5, h6 {
   height: 34px;
 }
 
+.card-img-top{
+  min-width: 30px;
+}
 
 </style>
 <template>
   <div class="card">
-    <div class="card-header">
-      <i>{{ username }}</i>
+
+    <div v-if="showDetails" class="card-header">
+      <i><b>{{ username }} </b> posted</i>
     </div>
     <img class="card-img-top" :src="link" alt="Card image cap">
-
-    <div class="card-body">
+    <div v-if="showDetails" class="card-body">
       <svg class="feather" stroke="black" :fill="likeColorFill()" @click="toggleLike()">
         <use href="/feather-sprite-v4.29.0.svg#heart"/>
         <text :x="likeX()" y="21" :stroke="likeColorText()" :fill="likeColorText()">{{ likes ? likes.length : 0 }}
@@ -148,7 +166,7 @@ h5, h6 {
 
         <div class="card-body" v-for="comment in comments">
           <h5 class="card-title">{{ getUserNameString(comment.user.username) }} </h5>
-          <button type="button" class="btn-close" aria-label="Close"></button>
+          <button v-if="isCurrentUser(comment.user.username)" type="button" class="btn-close" aria-label="Close" @click="deleteComment(comment.id)"></button>
           <p class="card-text">{{ comment.text }}</p>
         </div>
       </div>
