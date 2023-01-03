@@ -139,7 +139,7 @@ hr.solid {
     <div class="row">
       <div class="col-12">
         <Photo v-for="(photo, index)  in data['photos']"
-               :key="index"
+               :key="photo.uploadDate"
                :showLikesAndComments="false"
                :username="photo.user.username"
                :id="photo.id"
@@ -162,7 +162,6 @@ hr.solid {
                   :bans="bans"
                   @refreshProfile="refresh"></FollowersModal>
 
-  <span>{{ data }}</span>
 
 </template>
 

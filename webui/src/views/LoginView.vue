@@ -46,15 +46,17 @@ export default {
 <template>
   <LoadingSpinner  :loading="loading"/>
   <div class="vue-tempalte" v-if="!data">
+
+    <h3>WASA</h3>
     <form>
-      <h3>WASA</h3>
+
       <div class="form-group">
         <label>Username</label>
         <input type="text" class="form-control form-control-lg" v-model="username"/>
       </div>
-
-      <button @click="submit" class="btn btn-dark btn-lg btn-block">Sign In</button>
+      <button @click="submit" type="button" class="btn btn-primary">Sign In</button>
     </form>
+
   </div>
 
 </template>

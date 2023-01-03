@@ -52,20 +52,24 @@ type appdbmemimpl struct {
 	lock        sync.Mutex
 }
 
-func (m appdbmemimpl) FindUserProfileByUsername(username string) (model.Profile, error) {
+func (m *appdbmemimpl) FindUserProfileByUsername(username string) (model.Profile, error) {
 	profile := new(model.Profile)
 	user, err := m.findUserByUsername(username)
 	if err != nil {
 		return model.Profile{}, err
 	}
 	profile.User = &user
-	profile.Photos = m.FindAllPhotos(username)
+	photos := m.FindAllPhotos(username)
+	sort.Slice(photos, func(i, j int) bool {
+		return photos[i].UploadDate.After(photos[j].UploadDate)
+	})
+	profile.Photos = photos
 	profile.Followees = m.FindAllFollow(username)
 	profile.Followers = m.findAllFollowers(username)
 	return *profile, nil
 }
 
-func (m appdbmemimpl) UpdateUsername(_ string, oldUsername string, newUsername string) model.User {
+func (m *appdbmemimpl) UpdateUsername(_ string, oldUsername string, newUsername string) model.User {
 	user := new(model.User)
 	user.Id = m.userIdsMap[oldUsername]
 	user.Username = newUsername
@@ -82,7 +86,7 @@ UserStream // Each user will be presented with a stream of photos (images) in re
 with information about when each photo was uploaded date and time  and how many likes and comments it has.
 The stream is composed by photos from “following” (other users that the user follows).
 */
-func (m appdbmemimpl) subtract(from []string, what []string) []string {
+func (m *appdbmemimpl) subtract(from []string, what []string) []string {
 	var final []string
 	found := false
 	for _, f := range from {
@@ -102,7 +106,7 @@ func (m appdbmemimpl) subtract(from []string, what []string) []string {
 	return final
 }
 
-func (m appdbmemimpl) FindUserHomePageByUsername(username string) (model.UserHomePage, error) {
+func (m *appdbmemimpl) FindUserHomePageByUsername(username string) (model.UserHomePage, error) {
 	user, err := m.findUserByUsername(username)
 	if err != nil {
 		return model.UserHomePage{}, err
@@ -128,6 +132,7 @@ func (m appdbmemimpl) FindUserHomePageByUsername(username string) (model.UserHom
 	sort.Slice(photos, func(i, j int) bool {
 		return photos[i].UploadDate.After(photos[j].UploadDate)
 	})
+
 	homepage := new(model.UserHomePage)
 	homepage.Id = 0
 
@@ -137,7 +142,7 @@ func (m appdbmemimpl) FindUserHomePageByUsername(username string) (model.UserHom
 	return *homepage, nil
 }
 
-func (m appdbmemimpl) findUserByUsername(username string) (model.User, error) {
+func (m *appdbmemimpl) findUserByUsername(username string) (model.User, error) {
 	user := new(model.User)
 	id, ok := m.userIdsMap[username]
 	if ok {
@@ -148,7 +153,7 @@ func (m appdbmemimpl) findUserByUsername(username string) (model.User, error) {
 	return model.User{}, errors.New("no user")
 }
 
-func (m appdbmemimpl) FindPhoto(photoId int64) (model.Photo, error) {
+func (m *appdbmemimpl) FindPhoto(photoId int64) (model.Photo, error) {
 	photo, ok := m.photosMaps[photoId]
 	if ok {
 		photo.User.Username = m.usersMap[photo.User.Id].Username
@@ -161,7 +166,7 @@ func (m appdbmemimpl) FindPhoto(photoId int64) (model.Photo, error) {
 	return photo, nil
 }
 
-func (m appdbmemimpl) FindAllPhotos(username string) []model.Photo {
+func (m *appdbmemimpl) FindAllPhotos(username string) []model.Photo {
 	var photos []model.Photo
 
 	if username != "" {
@@ -189,7 +194,7 @@ func (m appdbmemimpl) FindAllPhotos(username string) []model.Photo {
 
 }
 
-func (m appdbmemimpl) DeletePhoto(requestorUser string, id int64) {
+func (m *appdbmemimpl) DeletePhoto(requestorUser string, id int64) {
 	elem, ok := m.photosMaps[id]
 	if ok && elem.User.Username == requestorUser {
 		likes := m.FindAllLikes(id)
@@ -206,7 +211,7 @@ func (m appdbmemimpl) DeletePhoto(requestorUser string, id int64) {
 	}
 }
 
-func (m appdbmemimpl) SavePhoto(username string, bytes []byte) model.Photo {
+func (m *appdbmemimpl) SavePhoto(username string, bytes []byte) model.Photo {
 	photo := new(model.Photo)
 	user := m.usersMap[m.userIdsMap[username]]
 	photo.User = new(model.User)
@@ -222,7 +227,7 @@ func (m appdbmemimpl) SavePhoto(username string, bytes []byte) model.Photo {
 	return *photo
 }
 
-func (m appdbmemimpl) FindAllLikes(photoId int64) []model.Like {
+func (m *appdbmemimpl) FindAllLikes(photoId int64) []model.Like {
 	var likes []model.Like
 	if photoId > 0 {
 		for _, like := range m.likesMap {
@@ -238,7 +243,7 @@ func (m appdbmemimpl) FindAllLikes(photoId int64) []model.Like {
 	return likes
 }
 
-func (m appdbmemimpl) existsLike(likeRequest model.LikeRequest) (bool, model.Like) {
+func (m *appdbmemimpl) existsLike(likeRequest model.LikeRequest) (bool, model.Like) {
 	for _, e := range m.likesMap {
 		if e.User.Username == likeRequest.User.Username && e.PhotoId == likeRequest.PhotoId {
 			return true, e
@@ -247,7 +252,7 @@ func (m appdbmemimpl) existsLike(likeRequest model.LikeRequest) (bool, model.Lik
 	return false, model.Like{}
 }
 
-func (m appdbmemimpl) SaveLike(likeRequest model.LikeRequest) model.Like {
+func (m *appdbmemimpl) SaveLike(likeRequest model.LikeRequest) model.Like {
 	ok, like := m.existsLike(likeRequest)
 	if ok {
 		return like
@@ -262,7 +267,7 @@ func (m appdbmemimpl) SaveLike(likeRequest model.LikeRequest) model.Like {
 	return like
 }
 
-func (m appdbmemimpl) DeleteLike(requestorUser string, id int64) {
+func (m *appdbmemimpl) DeleteLike(requestorUser string, id int64) {
 	elem, ok := m.likesMap[id]
 	if ok && elem.User.Username == requestorUser {
 		m.lock.Lock()
@@ -271,7 +276,7 @@ func (m appdbmemimpl) DeleteLike(requestorUser string, id int64) {
 	}
 }
 
-func (m appdbmemimpl) DeleteComment(requestorUser string, id int64) {
+func (m *appdbmemimpl) DeleteComment(requestorUser string, id int64) {
 	elem, ok := m.commentsMap[id]
 	if ok && elem.User.Username == requestorUser {
 		m.lock.Lock()
@@ -280,7 +285,7 @@ func (m appdbmemimpl) DeleteComment(requestorUser string, id int64) {
 	}
 }
 
-func (m appdbmemimpl) SaveComment(commentRequest model.CommentRequest) model.Comment {
+func (m *appdbmemimpl) SaveComment(commentRequest model.CommentRequest) model.Comment {
 	comment := new(model.Comment)
 	m.lock.Lock()
 	comment.Id = m.incrementAndGet()
@@ -293,7 +298,7 @@ func (m appdbmemimpl) SaveComment(commentRequest model.CommentRequest) model.Com
 	return *comment
 }
 
-func (m appdbmemimpl) FindAllComments(photoId int64) []model.Comment {
+func (m *appdbmemimpl) FindAllComments(photoId int64) []model.Comment {
 	var comments []model.Comment
 	if photoId > 0 {
 		for _, comment := range m.commentsMap {
@@ -310,7 +315,7 @@ func (m appdbmemimpl) FindAllComments(photoId int64) []model.Comment {
 
 }
 
-func (m appdbmemimpl) DeleteFollow(requestorUser string, id int64) {
+func (m *appdbmemimpl) DeleteFollow(requestorUser string, id int64) {
 	elem, ok := m.followsMap[id]
 	if ok && elem.User.Username == requestorUser {
 		m.lock.Lock()
@@ -319,7 +324,7 @@ func (m appdbmemimpl) DeleteFollow(requestorUser string, id int64) {
 	}
 }
 
-func (m appdbmemimpl) existsFollow(followRequest model.FollowRequest) (bool, model.Follow) {
+func (m *appdbmemimpl) existsFollow(followRequest model.FollowRequest) (bool, model.Follow) {
 	for _, e := range m.followsMap {
 		if e.User.Username == followRequest.User.Username && e.Followee.Username == followRequest.Followee.Username {
 			return true, e
@@ -328,7 +333,7 @@ func (m appdbmemimpl) existsFollow(followRequest model.FollowRequest) (bool, mod
 	return false, model.Follow{}
 }
 
-func (m appdbmemimpl) SaveFollow(followRequest model.FollowRequest) model.Follow {
+func (m *appdbmemimpl) SaveFollow(followRequest model.FollowRequest) model.Follow {
 	ok, follow := m.existsFollow(followRequest)
 	if ok {
 		return follow
@@ -346,7 +351,7 @@ func (m appdbmemimpl) SaveFollow(followRequest model.FollowRequest) model.Follow
 	return follow
 }
 
-func (m appdbmemimpl) FindAllFollow(username string) []model.Follow {
+func (m *appdbmemimpl) FindAllFollow(username string) []model.Follow {
 	var follows []model.Follow
 
 	for _, follow := range m.followsMap {
@@ -363,7 +368,7 @@ func (m appdbmemimpl) FindAllFollow(username string) []model.Follow {
 	return follows
 }
 
-func (m appdbmemimpl) findAllFollowers(username string) []model.Follow {
+func (m *appdbmemimpl) findAllFollowers(username string) []model.Follow {
 	var follows []model.Follow
 
 	for _, follow := range m.followsMap {
@@ -380,7 +385,7 @@ func (m appdbmemimpl) findAllFollowers(username string) []model.Follow {
 	return follows
 }
 
-func (m appdbmemimpl) DeleteBan(requestorUser string, id int64) {
+func (m *appdbmemimpl) DeleteBan(requestorUser string, id int64) {
 	elem, ok := m.bansMap[id]
 	if ok && elem.User.Username == requestorUser {
 		m.lock.Lock()
@@ -389,12 +394,12 @@ func (m appdbmemimpl) DeleteBan(requestorUser string, id int64) {
 	}
 }
 
-func (m appdbmemimpl) incrementAndGet() int64 {
+func (m *appdbmemimpl) incrementAndGet() int64 {
 	m.sequence[0] = m.sequence[0] + 1
 	return m.sequence[0]
 }
 
-func (m appdbmemimpl) SaveBan(banRequest model.BanRequest) model.Ban {
+func (m *appdbmemimpl) SaveBan(banRequest model.BanRequest) model.Ban {
 	ok, ban := m.existsBan(banRequest)
 	if ok {
 		return ban
@@ -410,7 +415,7 @@ func (m appdbmemimpl) SaveBan(banRequest model.BanRequest) model.Ban {
 	return ban
 }
 
-func (m appdbmemimpl) existsBan(banRequest model.BanRequest) (bool, model.Ban) {
+func (m *appdbmemimpl) existsBan(banRequest model.BanRequest) (bool, model.Ban) {
 	for _, e := range m.bansMap {
 		if e.User.Username == banRequest.User.Username && e.Banned.Username == banRequest.Banned.Username {
 			return true, e
@@ -419,7 +424,7 @@ func (m appdbmemimpl) existsBan(banRequest model.BanRequest) (bool, model.Ban) {
 	return false, model.Ban{}
 }
 
-func (m appdbmemimpl) FindAllBans(username string) []model.Ban {
+func (m *appdbmemimpl) FindAllBans(username string) []model.Ban {
 	var bans []model.Ban
 
 	for _, ban := range m.bansMap {
@@ -436,7 +441,7 @@ func (m appdbmemimpl) FindAllBans(username string) []model.Ban {
 	return bans
 }
 
-func (m appdbmemimpl) findAllBanners(username string) []model.Ban {
+func (m *appdbmemimpl) findAllBanners(username string) []model.Ban {
 	var bans []model.Ban
 
 	for _, ban := range m.bansMap {
@@ -453,7 +458,7 @@ func (m appdbmemimpl) findAllBanners(username string) []model.Ban {
 	return bans
 }
 
-func (m appdbmemimpl) FindAllUsers() []model.User {
+func (m *appdbmemimpl) FindAllUsers() []model.User {
 	var users []model.User
 	for e := range m.usersMap {
 		users = append(users, m.usersMap[e])
@@ -461,7 +466,7 @@ func (m appdbmemimpl) FindAllUsers() []model.User {
 	return users
 }
 
-func (m appdbmemimpl) SaveUser(username string) model.User {
+func (m *appdbmemimpl) SaveUser(username string) model.User {
 	e, ok := m.userIdsMap[username]
 	if ok {
 		return m.usersMap[e]
