@@ -2,7 +2,7 @@
 import {mutations, store} from "@/services/store";
 
 export default {
-  props: ['showDetails', 'username', 'id', 'uploadDate', 'link', 'comments', 'likes'],
+  props: ['show-details', 'username', 'id', 'uploadDate', 'link', 'comments', 'likes'],
   data: function () {
     return {
       toggleCommentBoxes: [],
@@ -164,7 +164,7 @@ h5, h6 {
           </div>
         </div>
 
-        <div class="card-body" v-for="comment in comments">
+        <div class="card-body" v-for="comment in comments" :key="comment.id">
           <h5 class="card-title">{{ getUserNameString(comment.user.username) }} </h5>
           <button v-if="isCurrentUser(comment.user.username)" type="button" class="btn-close" aria-label="Close" @click="deleteComment(comment.id)"></button>
           <p class="card-text">{{ comment.text }}</p>

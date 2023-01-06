@@ -19,7 +19,20 @@ export default {
     }
   },
   methods: {
-    async findAllBanned(){
+    async deletePhoto(photoId) {
+      try {
+        let username = store.username;
+        let authToken = store.authToken
+        let response = await this.$axios.delete(store.baseUrl + "/photos/" + photoId,
+            {
+              headers: {[authToken]: username}
+            });
+      } catch (e) {
+        this.errormsg = e.toString();
+      }
+      await this.refresh()
+    },
+    async findAllBanned() {
       try {
         let username = store.username;
         let authToken = store.authToken
@@ -80,6 +93,7 @@ hr.hr-text::before {
   left: 50%;
   transform: translate(-50%, -50%);
 }
+
 hr.solid {
   border-top: 2px solid #999;
 }
@@ -96,14 +110,15 @@ hr.solid {
       <div class="col-8">&nbsp;</div>
       <div class="col-4"><h1 class="h2" id="profileId">{{ username }}</h1></div>
     </div>
-      <div class="row">
-        <div class="col-8">&nbsp;</div>
-        <div class="col-4">
-          <button type="button" class="btn btn-outline-secondary border-0 btn-sm" data-bs-toggle="modal" data-bs-target="#changeUsernameModal">
-            edit username
-          </button>
-        </div>
+    <div class="row">
+      <div class="col-8">&nbsp;</div>
+      <div class="col-4">
+        <button type="button" class="btn btn-outline-secondary border-0 btn-sm" data-bs-toggle="modal"
+                data-bs-target="#changeUsernameModal">
+          edit username
+        </button>
       </div>
+    </div>
     <div class="row">
       <div class="col-12">
         <hr class="solid">
@@ -112,50 +127,82 @@ hr.solid {
     <div class="row">
       <div class="col-4">
         <p class="text-center">Photos:
-        <button type="button" class="btn btn-outline-primary border-0 btn-sm" data-bs-toggle="modal" data-bs-target="#newPhotoModal">
-          <b>{{ data['photos'] ? data['photos'].length : 0 }}</b>
-          <svg class="feather" fill="white" stroke="black"><use href="/feather-sprite-v4.29.0.svg#plus-circle"/></svg>
-        </button>
+          <button type="button" class="btn btn-outline-primary border-0 btn-sm" data-bs-toggle="modal"
+                  data-bs-target="#newPhotoModal">
+            <b>{{ data['photos'] ? data['photos'].length : 0 }}</b>
+            <svg class="feather" fill="white" stroke="black">
+              <use href="/feather-sprite-v4.29.0.svg#plus-circle"/>
+            </svg>
+          </button>
         </p>
       </div>
       <div class="col-4">
         <p class="text-center">Followee:
-        <button type="button" class="btn btn-outline-primary border-0 btn-sm" data-bs-toggle="modal" data-bs-target="#followeeModal">
-          <b>{{ data['followees'] ? data['followees'].length : 0 }}</b>
-          <svg class="feather" fill="white" stroke="black"><use href="/feather-sprite-v4.29.0.svg#zoom-in"/></svg>
-        </button>
+          <button type="button" class="btn btn-outline-primary border-0 btn-sm" data-bs-toggle="modal"
+                  data-bs-target="#followeeModal">
+            <b>{{ data['followees'] ? data['followees'].length : 0 }}</b>
+            <svg class="feather" fill="white" stroke="black">
+              <use href="/feather-sprite-v4.29.0.svg#zoom-in"/>
+            </svg>
+          </button>
         </p>
       </div>
       <div class="col-4">
         <p class="text-center">Followers:
-          <button type="button" class="btn btn-outline-primary border-0 btn-sm" data-bs-toggle="modal" data-bs-target="#followerModal">
+          <button type="button" class="btn btn-outline-primary border-0 btn-sm" data-bs-toggle="modal"
+                  data-bs-target="#followerModal">
             <b>{{ data['followers'] ? data['followers'].length : 0 }}</b>
-            <svg class="feather" fill="white" stroke="black"><use href="/feather-sprite-v4.29.0.svg#zoom-in"/></svg>
+            <svg class="feather" fill="white" stroke="black">
+              <use href="/feather-sprite-v4.29.0.svg#zoom-in"/>
+            </svg>
           </button>
         </p>
       </div>
     </div>
 
-    <div class="row">
-      <div class="col-12">
-        <Photo v-for="(photo, index)  in data['photos']"
-               :key="photo.uploadDate"
-               :showLikesAndComments="false"
-               :username="photo.user.username"
-               :id="photo.id"
-               :uploadDate="photo.uploadDate"
-               :link="baseUrl+ photo.link"
-        />
+    <div class="row" v-for="photo in data['photos']" :key="photo.id">
+      <div class="row">
+        <div class="col-12">
+          <Photo
+                 :show-details="false"
+                 :username="photo.user.username"
+                 :id="photo.id"
+                 :uploadDate="photo.uploadDate"
+                 :link="baseUrl+ photo.link"
+          />
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-8">
+          &nbsp;
+        </div>
+        <div class="col-4">
+          <button type="button" class="btn btn-primary" @click="deletePhoto(photo.id)">
+            <svg class="feather"  fill="white" stroke="black">
+              <use href="/feather-sprite-v4.29.0.svg#trash-2" />
+            </svg>
+            Delete
+          </button>
+
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <hr class="solid">
+          </div>
+        </div>
       </div>
     </div>
+
+
   </div>
 
-<!--  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal">-->
-<!--    Open modal-->
-<!--  </button>-->
+
+  <!--  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal">-->
+  <!--    Open modal-->
+  <!--  </button>-->
   <!-- The Modal -->
   <ChangeUsernameModal @refreshProfile="refresh"></ChangeUsernameModal>
-  <NewPhotoModal  @refreshProfile="refresh"></NewPhotoModal>
+  <NewPhotoModal @refreshProfile="refresh"></NewPhotoModal>
   <FolloweesModal :followees="this.data['followees']"
                   @refreshProfile="refresh"></FolloweesModal>
   <FollowersModal :followers="this.data['followers']"

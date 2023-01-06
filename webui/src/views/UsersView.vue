@@ -10,7 +10,6 @@ import {store} from "@/services/store";
 import router from "@/router";
 
 export default {
-  props: ['followees'],
   data: function () {
     return {
       loading: false,
@@ -66,11 +65,37 @@ export default {
       }
       this.loading = false;
     },
+    isFollowee(username){
+        return this.followees.find(e => e.followee.username === username)
+    },
+    async follow(usernameToFollow) {
+      try {
+        let username = store.username;
+        let authToken = store.authToken
+        let response = await this.$axios.post(store.baseUrl + "/follows",
+            {
+              user: {
+                username: store.username
+              },
+              followee: {
+                username: usernameToFollow
+              }
+            },
+            {
+              headers: {[authToken]: username}
+            });
+      } catch (e) {
+        this.errormsg = e.toString();
+      }
+      this.refresh()
+      //this.$emit('refreshProfile', 'VOID')
+    },
     refresh(){
       this.findAllUsers()
       this.findAllBanned()
       this.findAllFollowee()
     },
+
 
 
   },
@@ -108,9 +133,15 @@ hr.solid {
     </div>
     <div class="row">
       <div class="col-12">
+        <h1 class="h2">{{ username }}, add a friend!</h1>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
         <ul class="list-group">
-          <li v-for="user in data" class="list-group-item">{{user.username}}
-            <svg class="feather float-right" fill="white" stroke="black" ><use href="/feather-sprite-v4.29.0.svg#user-plus"/></svg>
+          <li v-for="user in users" class="list-group-item" :key="user.username">{{user.username}}
+            <svg v-if="!isFollowee(user.username)" @click="follow(user.username)" class="feather float-right" fill="white" stroke="black" ><use href="/feather-sprite-v4.29.0.svg#user-plus"/></svg>
+            <svg v-if="isFollowee(user.username)" class="feather float-right" fill="white" stroke="green" ><use href="/feather-sprite-v4.29.0.svg#user"/></svg>
           </li>
         </ul>
         &nbsp;</div>

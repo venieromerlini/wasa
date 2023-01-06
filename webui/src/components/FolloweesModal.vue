@@ -22,7 +22,7 @@ export default {
             {
               headers: {[authToken]: username}
             });
-        this.data = response.data;
+        //this.data = response.data;
       } catch (e) {
         this.errormsg = e.toString();
       }
@@ -50,7 +50,7 @@ export default {
         <!-- Modal body -->
         <div class="modal-body">
            <ul class="list-group list-group-flush">
-            <li  v-for="followee in followees" class="list-group-item">{{followee.followee.username}}
+            <li  v-for="followee in followees" class="list-group-item" :key="followee.followee.username">{{followee.followee.username}}
               <svg class="feather" fill="white" stroke="black" style="float:right" @click="stopFollow(followee.id)"><use href="/feather-sprite-v4.29.0.svg#user-minus"/></svg>
             </li>
           </ul>

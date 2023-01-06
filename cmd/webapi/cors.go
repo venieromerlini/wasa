@@ -9,7 +9,11 @@ import (
 // feature present in web browsers that blocks JavaScript requests going across different domains if not specified in a
 // policy. This function sends the policy of this API server.
 func applyCORSHandler(h http.Handler) http.Handler {
+
 	return handlers.CORS(
+		handlers.AllowedHeaders([]string{
+			"X-User-Session-Identifier", "Content-Type",
+		}),
 		handlers.AllowedMethods([]string{"GET", "POST", "OPTIONS", "DELETE", "PUT"}),
 		handlers.AllowedOrigins([]string{"*"}),
 	)(h)

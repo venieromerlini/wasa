@@ -1,6 +1,5 @@
 <script setup>
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
-
 </script>
 
 <script>
@@ -15,18 +14,32 @@ export default {
       username: ''
     }
   },
+  computed: {
+
+  },
   methods: {
     goToHomePage() {
         router.push("/home")
     },
-
+    isDisabled() {
+      return this.username.length < 3;
+    },
     async submit() {
       this.loading = true;
       try {
+        let username = store.username;
+        let authToken = store.authToken
         let response = await this.$axios.post(store.baseUrl +"/session",
             {
               name: this.username
-            });
+            },
+            {
+              headers: {
+                [authToken]: 'not-yet',
+                'Content-Type': 'application/json'
+              }
+            }
+            );
 
         mutations.setUserData(response.data.identifier);
 
@@ -54,7 +67,9 @@ export default {
         <label>Username</label>
         <input type="text" class="form-control form-control-lg" v-model="username"/>
       </div>
-      <button @click="submit" type="button" class="btn btn-primary">Sign In</button>
+      <button @click="submit"
+              :disabled="isDisabled(username)"
+              type="button" class="btn btn-primary">Sign In</button>
     </form>
 
   </div>

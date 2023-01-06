@@ -73,7 +73,7 @@ export default {
         <!-- Modal body -->
         <div class="modal-body">
            <ul class="list-group list-group-flush">
-            <li  v-for="follower in followers" class="list-group-item">{{follower.user.username}}
+            <li  v-for="follower in followers" class="list-group-item" :key="follower.user.username">{{follower.user.username}}
               <svg v-if="!alsoBanned(follower.user.username)" class="feather" fill="white" stroke="green" style="float:right" @click="ban(follower.user.username)">
                 <use href="/feather-sprite-v4.29.0.svg#unlock"/>
               </svg>
@@ -81,11 +81,6 @@ export default {
                 <use href="/feather-sprite-v4.29.0.svg#lock"/>
               </svg>
             </li>
-<!--             <li  v-for="ban in this.bans" class="list-group-item">{{ban.banned.username}}-->
-<!--               <svg class="feather" fill="white" stroke="red" style="float:right" @click="unban(ban.id)">-->
-<!--                 <use href="/feather-sprite-v4.29.0.svg#lock"/>-->
-<!--               </svg>-->
-<!--             </li>-->
           </ul>
         </div>
         <!-- Modal footer -->

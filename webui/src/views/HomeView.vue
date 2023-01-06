@@ -107,9 +107,8 @@ hr.solid {
     </div>
     <div class="row">
       <div class="col-12">
-        <Photo v-for="(photo, index)  in data['photos']"
-               :key="index"
-               :showDetails="true"
+        <Photo v-for="photo in data['photos']" :key="photo.id"
+               :show-details="true"
                :username="photo.user.username"
                :id="photo.id"
                :uploadDate="photo.uploadDate"
