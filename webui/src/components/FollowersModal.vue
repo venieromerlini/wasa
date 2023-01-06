@@ -1,6 +1,6 @@
 
 <script>
-import {mutations, store} from "@/services/store";
+import {store} from "@/services/store";
 
 export default {
   props: ['followers', 'bans'],
@@ -16,7 +16,7 @@ export default {
       try {
         let username = store.username;
         let authToken = store.authToken
-        let response = await this.$axios.delete(store.baseUrl + "/bans/" + this.findBanByBannerUsername(bannedUser).id,
+        await this.$axios.delete(store.baseUrl + "/bans/" + this.findBanByBannerUsername(bannedUser).id,
             {
               headers: {[authToken]: username}
             });
@@ -29,7 +29,7 @@ export default {
       try {
         let username = store.username;
         let authToken = store.authToken
-        let response = await this.$axios.post(store.baseUrl + "/bans",
+        await this.$axios.post(store.baseUrl + "/bans",
             {
                   user: {
                     username: store.username

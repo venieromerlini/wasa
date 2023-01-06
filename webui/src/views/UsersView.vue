@@ -1,9 +1,4 @@
-<script setup>
-import Photo from "@/components/Photo.vue";
-import ChangeUsernameModal from "@/components/ChangeUsernameModal.vue";
-import FolloweesModal from "@/components/FolloweesModal.vue";
-import FollowersModal from "@/components/FollowersModal.vue";
-import NewPhotoModal from "@/components/NewPhotoModal.vue";</script>
+<script setup></script>
 
 <script>
 import {store} from "@/services/store";
@@ -72,7 +67,7 @@ export default {
       try {
         let username = store.username;
         let authToken = store.authToken
-        let response = await this.$axios.post(store.baseUrl + "/follows",
+        await this.$axios.post(store.baseUrl + "/follows",
             {
               user: {
                 username: store.username

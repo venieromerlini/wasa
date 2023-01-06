@@ -27,7 +27,7 @@ export default {
     async submit() {
       this.loading = true;
       try {
-        let username = store.username;
+        //let username = store.username;
         let authToken = store.authToken
         let response = await this.$axios.post(store.baseUrl +"/session",
             {

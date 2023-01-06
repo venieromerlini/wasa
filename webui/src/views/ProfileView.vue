@@ -23,7 +23,7 @@ export default {
       try {
         let username = store.username;
         let authToken = store.authToken
-        let response = await this.$axios.delete(store.baseUrl + "/photos/" + photoId,
+        await this.$axios.delete(store.baseUrl + "/photos/" + photoId,
             {
               headers: {[authToken]: username}
             });

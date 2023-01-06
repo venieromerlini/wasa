@@ -1,6 +1,6 @@
 
 <script>
-import {mutations, store} from "@/services/store";
+import {store} from "@/services/store";
 
 export default {
   props: ['followees'],
@@ -18,7 +18,7 @@ export default {
       try {
         let username = store.username;
         let authToken = store.authToken
-        let response = await this.$axios.delete(store.baseUrl + "/follows/" + followId,
+        await this.$axios.delete(store.baseUrl + "/follows/" + followId,
             {
               headers: {[authToken]: username}
             });
