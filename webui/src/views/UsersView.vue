@@ -28,6 +28,8 @@ export default {
               headers: {[authToken]: username}
             });
         this.users = response.data.filter((e) => e.username != store.username);
+        this.users.sort((a,b) => (a.username > b.username) ? 1 : ((b.username > a.username) ? -1 : 0))
+
       } catch (e) {
         this.errormsg = e.toString();
       }
@@ -54,7 +56,8 @@ export default {
             {
               headers: {[authToken]: username}
             });
-        this.followees = response.data.followees;
+        this.followees = response.data.followees ? response.data.followees : [];
+
       } catch (e) {
         this.errormsg = e.toString();
       }

@@ -119,6 +119,11 @@ hr.solid {
         />
       </div>
     </div>
+    <div class="row">
+      <div class="col-12">
+        <p>If you're new, click on the lens to meet new friends!</p>
+      </div>
+    </div>
   </div>
 
 <!--    <ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>-->

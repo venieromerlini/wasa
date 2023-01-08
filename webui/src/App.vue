@@ -10,14 +10,14 @@ import {mutations, store} from '@/services/store.js'
 export default {
 
   data() {
-    return {
-      isUserLogged: store.isUserLogged
-    }
   },
   methods:{
     refresh() {
       this.isUserLogged = store.isUserLogged
-    }
+    },
+    isLogged(){
+      return store.isUserLogged
+    },
   },
   beforeMount() {
     if (!store.isUserLogged){
@@ -50,20 +50,20 @@ export default {
               <span>settings</span>
             </h6>
             <ul class="nav flex-column">
-              <li class="nav-item" v-if="!isUserLogged">
+              <li class="nav-item" v-if="!isLogged()">
                 <RouterLink to="/login" class="nav-link">
                   <svg class="feather"><use href="/feather-sprite-v4.29.0.svg#home"/></svg>
                   Login
                 </RouterLink>
               </li>
 
-              <li class="nav-item" v-if="isUserLogged">
+              <li class="nav-item" v-if="isLogged()">
                 <RouterLink to="/home" class="nav-link">
                   <svg class="feather"><use href="/feather-sprite-v4.29.0.svg#home"/></svg>
                   Home
                 </RouterLink>
               </li>
-              <li class="nav-item" v-if="isUserLogged">
+              <li class="nav-item" v-if="isLogged()">
                 <RouterLink to="/profile" class="nav-link">
                   <svg class="feather"><use href="/feather-sprite-v4.29.0.svg#user"/></svg>
                   Profile
