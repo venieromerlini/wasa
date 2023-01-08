@@ -13,6 +13,9 @@ export default {
     return {
       loading: false,
       data: {},
+      photos: [],
+      followees: [],
+      followers: [],
       bans: [],
       username: store.username,
       baseUrl: store.baseUrl
@@ -50,25 +53,35 @@ export default {
       this.username = store.username
       this.loading = true;
       this.errormsg = null;
+      let username = store.username;
+      let authToken = store.authToken
       try {
-
-        let username = store.username;
-        let authToken = store.authToken
         let response = await this.$axios.get(store.baseUrl + "/users/" + username,
             {
               headers: {[authToken]: username}
             });
-        this.data = response.data;
+        //this.data = response.data;
+        this.photos = response.data ? response.data.photos : [];
+        this.followers = response.data ? response.data.followers : [];
+        this.followees = response.data ? response.data.followees: [];
       } catch (e) {
         this.errormsg = e.toString();
       }
       this.loading = false;
 
-      await this.findAllBanned()
+      try {
+        let response = await this.$axios.get(store.baseUrl + "/bans?username=" + username,
+            {
+              headers: {[authToken]: username}
+            });
+        this.bans = response.data;
+      } catch (e) {
+        this.errormsg = e.toString();
+      }
+      this.$emit('refreshProfile', 'VOID')
     },
   },
   mounted() {
-
     this.refresh()
     var myCollapse = document.getElementById('sidebarMenu')
     var bsCollapse = new bootstrap.Collapse(myCollapse, {
@@ -129,7 +142,7 @@ hr.solid {
         <p class="text-center">Photos:
           <button type="button" class="btn btn-outline-primary border-0 btn-sm" data-bs-toggle="modal"
                   data-bs-target="#newPhotoModal">
-            <b>{{ data['photos'] ? data['photos'].length : 0 }}</b>
+            <b>{{ photos ? photos.length : 0 }}</b>
             <svg class="feather" fill="white" stroke="black">
               <use href="/feather-sprite-v4.29.0.svg#plus-circle"/>
             </svg>
@@ -140,7 +153,7 @@ hr.solid {
         <p class="text-center">Followee:
           <button type="button" class="btn btn-outline-primary border-0 btn-sm" data-bs-toggle="modal"
                   data-bs-target="#followeeModal">
-            <b>{{ data['followees'] ? data['followees'].length : 0 }}</b>
+            <b>{{ followees ? followees.length : 0 }}</b>
             <svg class="feather" fill="white" stroke="black">
               <use href="/feather-sprite-v4.29.0.svg#zoom-in"/>
             </svg>
@@ -151,7 +164,7 @@ hr.solid {
         <p class="text-center">Followers:
           <button type="button" class="btn btn-outline-primary border-0 btn-sm" data-bs-toggle="modal"
                   data-bs-target="#followerModal">
-            <b>{{ data['followers'] ? data['followers'].length : 0 }}</b>
+            <b>{{ followers ? followers.length : 0 }}</b>
             <svg class="feather" fill="white" stroke="black">
               <use href="/feather-sprite-v4.29.0.svg#zoom-in"/>
             </svg>
@@ -160,7 +173,7 @@ hr.solid {
       </div>
     </div>
 
-    <div class="row" v-for="photo in data['photos']" :key="photo.id">
+    <div class="row" v-for="photo in photos" :key="photo.id">
       <div class="row">
         <div class="col-12">
           <Photo
@@ -203,9 +216,9 @@ hr.solid {
   <!-- The Modal -->
   <ChangeUsernameModal @refreshProfile="refresh"></ChangeUsernameModal>
   <NewPhotoModal @refreshProfile="refresh"></NewPhotoModal>
-  <FolloweesModal :followees="this.data['followees']"
+  <FolloweesModal :followees="followees"
                   @refreshProfile="refresh"></FolloweesModal>
-  <FollowersModal :followers="this.data['followers']"
+  <FollowersModal :followers="followers"
                   :bans="bans"
                   @refreshProfile="refresh"></FollowersModal>
 
