@@ -8,7 +8,8 @@ export default {
       data: {},
       username: store.username,
       baseUrl: store.baseUrl,
-      newUsername : ''
+      newUsername : '',
+      change : 0,
     }
   },
   methods: {
@@ -27,15 +28,20 @@ export default {
             });
         this.data = response.data;
         mutations.setUserData(this.data.username)
+        this.change = 1
       } catch (e) {
+        this.change = -1
+        console.log(e)
         this.errormsg = e.toString();
       }
       this.$emit('refreshProfile', 'VOID')
 
+    },
+    resetAlert(){
+      this.change = 0
     }
   },
   mounted() {
-
   }
 }
 </script>
@@ -59,13 +65,19 @@ export default {
               <input type="text" v-model="newUsername" class="form-control" id="usernameId" >
 <!--              <div id="usernameHelp" class="form-text">Insert the new username</div>-->
             </div>
+            <div v-if="change>0" class="alert alert-success" role="alert">
+              Username changed successfully
+            </div>
+            <div v-if="change<0" class="alert alert-danger" role="alert">
+              Couldn't change username!
+            </div>
           </form>
         </div>
 
         <!-- Modal footer -->
         <div class="modal-footer">
           <button type="submit" class="btn btn-primary" @click="changeUsername">Change</button>
-          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @click="resetAlert">Close</button>
         </div>
       </div>
     </div>

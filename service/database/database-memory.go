@@ -35,7 +35,7 @@ type AppDatabaseMemory interface {
 	FindAllPhotos(username string) []model.Photo
 	FindPhoto(photoId int64) (model.Photo, error)
 
-	UpdateUsername(requestorUser string, oldUsername string, newUsername string) model.User
+	UpdateUsername(requestorUser string, oldUsername string, newUsername string) (model.User, error)
 	FindUserHomePageByUsername(username string) (model.UserHomePage, error)
 	FindUserProfileByUsername(username string) (model.Profile, error)
 }
@@ -69,8 +69,14 @@ func (m *appdbmemimpl) FindUserProfileByUsername(username string) (model.Profile
 	return *profile, nil
 }
 
-func (m *appdbmemimpl) UpdateUsername(_ string, oldUsername string, newUsername string) model.User {
+func (m *appdbmemimpl) UpdateUsername(_ string, oldUsername string, newUsername string) (model.User, error) {
 	user := new(model.User)
+
+	_, err := m.findUserByUsername(newUsername)
+	if err == nil {
+		return *user, errors.New("user already existing")
+	}
+
 	user.Id = m.userIdsMap[oldUsername]
 	user.Username = newUsername
 	m.lock.Lock()
@@ -78,7 +84,7 @@ func (m *appdbmemimpl) UpdateUsername(_ string, oldUsername string, newUsername 
 	m.userIdsMap[newUsername] = user.Id
 	delete(m.userIdsMap, oldUsername)
 	m.lock.Unlock()
-	return *user
+	return *user, nil
 }
 
 /*

@@ -93,9 +93,14 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 		return
 	}
 
-	user := rt.memdb.UpdateUsername(requestorUser, oldUsername, newUser.Username)
-	body, err := json.Marshal(user)
+	user, errUpdateUsername := rt.memdb.UpdateUsername(requestorUser, oldUsername, newUser.Username)
+	if errUpdateUsername != nil {
+		rt.util.WriteError400(w, errUpdateUsername)
+		return
+	}
+
+	body, errParse := json.Marshal(user)
 	if rt.util.WriteResponse(w, body) != nil {
-		rt.util.WriteError500(w, err)
+		rt.util.WriteError500(w, errParse)
 	}
 }
