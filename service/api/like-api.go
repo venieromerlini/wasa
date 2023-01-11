@@ -61,7 +61,6 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 		http.Error(w, err2.Error(), http.StatusInternalServerError)
 		return
 	}
-
 }
 
 func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {

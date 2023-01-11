@@ -303,6 +303,9 @@ func populateMockData(memdb database.AppDatabaseMemory, logger *logrus.Logger) {
 		PhotoId: photo3.Id,
 	})
 
-	memdb.UpdateUsername("_", veniero.Username, "veniero")
+	_, errUpdateUsername := memdb.UpdateUsername("_", veniero.Username, "veniero")
 
+	if errUpdateUsername != nil {
+		logger.Error("error: updating username in mock data")
+	}
 }
