@@ -13,6 +13,7 @@ type Util interface {
 	WriteError404(w http.ResponseWriter, err error)
 	WriteError401(w http.ResponseWriter, err error)
 	WriteError400(w http.ResponseWriter, err error)
+	WriteError409(w http.ResponseWriter, err error)
 }
 
 type utilImpl struct {
@@ -35,6 +36,11 @@ func (u utilImpl) GetAuthToken(r *http.Request) (string, error) {
 func (u utilImpl) WriteError500(w http.ResponseWriter, err error) {
 	u.log.Error("error: ", err)
 	http.Error(w, "", http.StatusInternalServerError)
+}
+
+func (u utilImpl) WriteError409(w http.ResponseWriter, err error) {
+	u.log.Error("error: ", err)
+	http.Error(w, "", http.StatusConflict)
 }
 
 func (u utilImpl) WriteError404(w http.ResponseWriter, err error) {
